@@ -32,6 +32,12 @@ public:
 	void ResetMatrix();
 	// 전치 행렬 전환 함수
 	void TransMatrix();
+	// 행렬식 값 츨력 함수
+	void PrintDeterminant();
+	// 4X4 행렬로 변환
+	
+	// 주소 확인 함수
+	// void MM();
 
 	// 행렬 곱하기 연산자
 	Matrix operator*(const Matrix& another);
@@ -41,6 +47,8 @@ public:
 	Matrix operator+(const Matrix& another);
 	// 뺄셈 연산자
 	Matrix operator-(const Matrix& another);
+	// 대입 연산자
+	Matrix& operator=(const Matrix& another);
 };
 
 Matrix::Matrix()
@@ -91,6 +99,12 @@ void Matrix::TransMatrix()
 			m[j][i] = tmp;
 		}
 	}
+}
+
+void Matrix::PrintDeterminant()
+{
+	cout << "행렬식 값 : " << endl;
+	cout << (m[0][0] * m[1][1] * m[2][2] + m[0][1] * m[1][2] * m[2][0] + m[0][2] * m[1][0] * m[2][1] - (m[0][0] * m[1][2] * m[2][1] + m[0][1] * m[1][0] * m[2][2] + m[0][2] * m[1][1] * m[2][0])) << endl;
 }
 
 Matrix Matrix::operator*(const Matrix& another)
@@ -146,6 +160,17 @@ Matrix  Matrix::operator-(const Matrix& another)
 	return rm;
 }
 
+Matrix& Matrix::operator=(const Matrix& another)
+{
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			m[i][j] = another.m[i][j];
+		}
+	}
+
+	return *this;
+}
+
 // q면 0 그 외 1리턴
 int CommandCheck(char c, Matrix& m1, Matrix& m2)
 {
@@ -171,7 +196,8 @@ int CommandCheck(char c, Matrix& m1, Matrix& m2)
 		break;
 	case 'r':
 	case 'R':
-		
+		m1.PrintDeterminant();
+		m2.PrintDeterminant();
 		break;
 	case 't':
 	case 'T':
@@ -199,6 +225,20 @@ int CommandCheck(char c, Matrix& m1, Matrix& m2)
 }
 
 
+//void Matrix::MM()
+//{
+//	Matrix mm;
+//
+//	cout << &mm.m[0][0] << endl;
+//	cout << &(this->m[0][0]) << endl;
+//
+//	mm = *this;
+//
+//	cout << &mm.m[0][0] << endl;
+//	cout << &(this->m[0][0]) << endl;
+//
+//}
+
 int main()
 {
 	// 랜덤 시드
@@ -212,7 +252,6 @@ int main()
 	m1.PrintMatrix();
 	cout << "행렬 2" << endl;
 	m2.PrintMatrix();
-	
 
 	while (1) {
 
