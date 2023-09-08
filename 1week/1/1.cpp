@@ -22,8 +22,9 @@ class Matrix
 {
 private:
 	int** m;
+	int size;
 public:
-	Matrix();
+	Matrix(const int& _size);
 	~Matrix();
 
 	// 행렬 출력
@@ -32,8 +33,8 @@ public:
 	void ResetMatrix();
 	// 전치 행렬 전환 함수
 	void TransMatrix();
-	// 행렬식 값 츨력 함수
-	void PrintDeterminant();
+	// 행렬식 구하는 재귀함수
+	Matrix FindDeterminant();
 	// 4X4 행렬로 변환
 	
 	// 주소 확인 함수
@@ -51,19 +52,20 @@ public:
 	Matrix& operator=(const Matrix& another);
 };
 
-Matrix::Matrix()
+Matrix::Matrix(const int& _size)
 {
-	// 3X3 배열 동적할당
-	m = new int* [3];
-	for (int i = 0; i < 3; ++i)
-		m[i] = new int[3];
+	// 동적할당
+	size = _size;
+	m = new int* [size];
+	for (int i = 0; i < size; ++i)
+		m[i] = new int[size];
 }
 
 Matrix::~Matrix()
 {
 	// 동적할당 해제
 	if (!m) {
-		for (int i = 0; i < 3; ++i)
+		for (int i = 0; i < size; ++i)
 			delete[] m[i];
 		delete[] m;
 	}
@@ -72,8 +74,8 @@ Matrix::~Matrix()
 void Matrix::ResetMatrix()
 {
 	// 행렬 랜덤 값 입력
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
 			m[i][j] = rand() % 3;
 		}
 	}
@@ -81,8 +83,8 @@ void Matrix::ResetMatrix()
 
 void Matrix::PrintMatrix()
 {
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
 			cout << m[i][j] << ' ';
 		}
 		cout << endl;
@@ -92,8 +94,8 @@ void Matrix::PrintMatrix()
 
 void Matrix::TransMatrix()
 {
-	for (int i = 0; i < 2; ++i) {
-		for (int j = 1; j < 3; ++j) {
+	for (int i = 0; i < size - 1; ++i) {
+		for (int j = 1; j < size; ++j) {
 			int tmp = m[i][j];
 			m[i][j] = m[j][i];
 			m[j][i] = tmp;
@@ -101,18 +103,18 @@ void Matrix::TransMatrix()
 	}
 }
 
-void Matrix::PrintDeterminant()
+Matrix Matrix::FindDeterminant()
 {
-	cout << "행렬식 값 : " << endl;
-	cout << (m[0][0] * m[1][1] * m[2][2] + m[0][1] * m[1][2] * m[2][0] + m[0][2] * m[1][0] * m[2][1] - (m[0][0] * m[1][2] * m[2][1] + m[0][1] * m[1][0] * m[2][2] + m[0][2] * m[1][1] * m[2][0])) << endl;
+	
+
 }
 
 Matrix Matrix::operator*(const Matrix& another)
 {
-	Matrix rm;
+	Matrix rm(size);
 
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
 			/*
 			첫 번째 행렬은 행이 바뀌고 두 번째 행렬은 열이 바뀜
 			 result matrix[0][0] = m1[0][0] * m2[0][0] + m1[0][1] * m2[1][0] + m1[0][2] * m2[2][0]
@@ -127,8 +129,8 @@ Matrix Matrix::operator*(const Matrix& another)
 
 void Matrix::operator*(const int num)
 {
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
 			m[i][j] *= num;
 		}
 	}
@@ -136,10 +138,10 @@ void Matrix::operator*(const int num)
 
 Matrix  Matrix::operator+(const Matrix& another)
 {
-	Matrix rm;
+	Matrix rm(size);
 
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
 			rm.m[i][j] = this->m[i][j] + another.m[i][j];
 		}
 	}
@@ -149,10 +151,10 @@ Matrix  Matrix::operator+(const Matrix& another)
 
 Matrix  Matrix::operator-(const Matrix& another)
 {
-	Matrix rm;
+	Matrix rm(size);
 
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
 			rm.m[i][j] = this->m[i][j] - another.m[i][j];
 		}
 	}
@@ -162,8 +164,8 @@ Matrix  Matrix::operator-(const Matrix& another)
 
 Matrix& Matrix::operator=(const Matrix& another)
 {
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
 			m[i][j] = another.m[i][j];
 		}
 	}
@@ -196,8 +198,7 @@ int CommandCheck(char c, Matrix& m1, Matrix& m2)
 		break;
 	case 'r':
 	case 'R':
-		m1.PrintDeterminant();
-		m2.PrintDeterminant();
+		
 		break;
 	case 't':
 	case 'T':
@@ -243,7 +244,7 @@ int main()
 {
 	// 랜덤 시드
 	srand((unsigned int)time(NULL));
-	Matrix m1, m2;
+	Matrix m1(3), m2(3);
 	m1.ResetMatrix();
 	m2.ResetMatrix();
 
