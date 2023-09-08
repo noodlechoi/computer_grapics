@@ -31,12 +31,15 @@ public:
 	void PrintMatrix();
 	// 행렬 값 설정 함수
 	void ResetMatrix();
+	// 3X3 행렬식 반환 함수
+	int ReturnDeterminant();
 	// 전치 행렬 전환 함수
 	void TransMatrix();
-	// 행렬식 구하는 재귀함수
-	Matrix FindDeterminant();
 	// 4X4 행렬로 변환
-	
+	void TransFourMatrix();
+	// 4X4 행렬식 함수
+	int ReturnFourDet();
+
 	// 주소 확인 함수
 	// void MM();
 
@@ -103,10 +106,86 @@ void Matrix::TransMatrix()
 	}
 }
 
-Matrix Matrix::FindDeterminant()
+int Matrix::ReturnDeterminant()
 {
-	
+	// 4X4 예외처리
+	try {
+		if (size != 3) throw size;
+	}
+	catch (const std::exception& e) {
+		cout << "3X3 행렬이 아닙니다. -1를 반환합니다." << endl;
+		return -1;
+	}
 
+	return (m[0][0] * m[1][1] * m[2][2] + m[0][1] * m[1][2] * m[2][0] + m[0][2] * m[1][0] * m[2][1] - (m[0][0] * m[1][2] * m[2][1] + m[0][1] * m[1][0] * m[2][2] + m[0][2] * m[1][1] * m[2][0]));
+}
+
+void Matrix::TransFourMatrix()
+{
+	Matrix copy_m(size);
+	copy_m = *this;
+
+	// 동적할당 해제
+	if (!m) {
+		for (int i = 0; i < size; ++i)
+			delete[] m[i];
+		delete[] m;
+	}
+
+	// 크기 4만큼 동적할당
+	if (m) {
+		size = 4;
+		m = new int* [size];
+		for (int i = 0; i < size; ++i)
+			m[i] = new int[size];
+	}
+
+	// 원소 다시 복사
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
+			if (j == size - 1 || i == size - 1)	m[i][j] = 0;
+			else
+				m[i][j] = copy_m.m[i][j];
+		}
+	}
+	m[3][3] = 1;
+
+
+}
+
+int Matrix::ReturnFourDet()
+{
+	Matrix tmp(3);
+	int result = 0;
+
+	for (int k = 0; k < size; ++k) {
+
+		int cnt = 0;
+		for (int i = 0; i < size; ++i) {
+			for (int j = 0; j < size; ++j) {
+				// 행이나 열이 같은 행이나 열에 있을 때 제외
+				if (j == k || i == 0) continue;
+				tmp.m[cnt / tmp.size][cnt % tmp.size] = m[i][j];
+				cnt++;
+			}
+		}
+
+		//tmp.PrintMatrix();
+
+		// 짝수면 -
+		if (k % 2 == 0) {
+			tmp * m[0][k];
+			
+		}
+		// 홀수면 +
+		else {
+			tmp * (-m[0][k]);
+		}
+		result += tmp.ReturnDeterminant();
+
+	}
+
+	return result;
 }
 
 Matrix Matrix::operator*(const Matrix& another)
@@ -198,15 +277,35 @@ int CommandCheck(char c, Matrix& m1, Matrix& m2)
 		break;
 	case 'r':
 	case 'R':
-		
+		cout << "행렬 1 행렬식 : " << m1.ReturnDeterminant() << endl;
+		cout << "행렬 2 행렬식 : " << m2.ReturnDeterminant() << endl;
 		break;
 	case 't':
 	case 'T':
 		m1.TransMatrix();
 		m2.TransMatrix();
+		cout << endl;
+		cout << "전치행렬로 전환 완료" << endl;
+
+		cout << "행렬 1" << endl;
+		m1.PrintMatrix();
+		cout << "행렬 2" << endl;
+		m2.PrintMatrix();
+		cout << "행렬 1 행렬식 : " << m1.ReturnDeterminant() << endl;
+		cout << "행렬 2 행렬식 : " << m2.ReturnDeterminant() << endl;
 		break;
 	case 'h':
 	case 'H':
+		m1.TransFourMatrix();
+		m2.TransFourMatrix();
+
+		cout << "행렬 1" << endl;
+		m1.PrintMatrix();
+		cout << "행렬 2" << endl;
+		m2.PrintMatrix();
+
+		cout << "행렬 1 행렬식 : " << m1.ReturnFourDet() << endl;
+		cout << "행렬 2 행렬식 : " << m2.ReturnFourDet() << endl;
 		break;
 	case 's':
 	case 'S':
