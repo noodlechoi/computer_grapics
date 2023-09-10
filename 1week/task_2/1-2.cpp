@@ -45,27 +45,54 @@ int main()
 	// 단어 수 출력
 	int word = 0;
 	int number = 0;
+	int capital = 0;
 	for (int i = 0; i < 10; ++i) {
+		bool is_number = false;
+		bool is_alpha = false;
+		bool is_capital = false;
 		for (int j = 0; j < str[i].length(); ++j) {
-			// 띄어쓰기마다 단어 하나로
+			// 숫자일 때
+			if (!is_number && (str[i][j] >= '0' && str[i][j] <= '9')) is_number = true;
+			// 문자일때
+			if (!is_alpha && ((str[i][j] >= 'A' && str[i][j] <= 'Z') || str[i][j] >= 'a' && str[i][j] <= 'z')) is_alpha = true;
+			if (!is_capital && (str[i][j] >= 'A' && str[i][j] <= 'Z')) is_capital = true;
+
+			// 띄어쓰기마다
 			if (str[i][j] == ' ') {
+				// 한 단어에 숫자 문자 있으면 => 문자 취급
+				if (is_alpha && is_number)
+					word++;
+				else if (is_alpha)
+					word++;
+				else if (is_number)
+					number++;
+				if (is_capital)
+					capital++;
+				is_number = false;
+				is_alpha = false;
+				is_capital = false;
+			}
+		}
+		// 마지막 단어 검사
+		if (str[i][str[i].length() - 1]) {
+			// 한 단어에 숫자 문자 있으면 => 문자 취급
+			if (is_alpha && is_number)
 				word++;
-				if (j != 0) {	// -1 인덱스 방지
-					// 이전에 연속으로 띄어쓰기가 더 있거나 숫자면 다시 마이너스
-					if (str[i][j - 1] == ' ' || (str[i][j - 1] >= '0' && str[i][j - 1] <= '9')) word--;
-				}
-			}
-			// 한 줄에 단어만 있는 경우 방지
-			if (str[i].find(" ") != string::npos) {
-				// 마지막 단어가 숫자가 아니면 word 추가
-				if (j == str[i].length() - 1) {
-					if (!(str[i][j - 1] >= '0' && str[i][j - 1] <= '9')) word++;
-				}
-			}
+			else if (is_alpha)
+				word++;
+			else if (is_number)
+				number++;
+			if (is_capital)
+				capital++;
+			is_number = false;
+			is_alpha = false;
+			is_capital = false;
 		}
 	}
 
-	cout << word << endl;
+	cout << "word count : " << word << endl;
+	cout << "number count : " << number << endl;
+	cout << "capital count : " << capital << endl;
 
 	// 파일 닫기
 	file.close();
