@@ -28,7 +28,11 @@ private:
 public:
 	void OutputStr(const string& str);
 	void ReverseStr(string& str);
-
+	void InsertSpecial(string& str);
+	void EraseSpecial(string& str);
+	void ReverseSpace(string& str);
+	void ReplaceStr(const char& changed, const char& changing, string& str);
+	void Palindrome(string& str);
 	/*void NumberChange(string& str, const char& m);*/
 };
 
@@ -49,28 +53,59 @@ void ControlStr::ReverseStr(string& str)
 	}
 }
 
-//
-//void ControlStr::NumberChange(string& str, const char& m)
-//{
-//	std::istringstream iss(str);
-//	string buffer;
-//
-//	// 띄어쓰기 기준으로 str을 buffer에 입력
-//	// 맨 마지막 단어는??
-//	while (getline(iss, buffer, ' ')) {
-//		int num = stoi(buffer);
-//		num++;
-//		buffer = std::to_string(num);
-//
-//
-//	}
-//
-//	for (int j = 0; j < str.length(); ++j) {
-//		if (str[j] >= '0' && str[j] <= '9') {
-//			
-//		}
-//	}
-//}
+void ControlStr::InsertSpecial(string& str)
+{
+	int cnt = 0;
+	for (int i = 0; i < str.length(); ++i) {
+		// cnt가 3의 배수일 때 넣기
+		if (cnt != 0 && cnt % 3 == 0) {
+			str.insert(i, "@@");
+			i += 2;
+		}
+		cnt++;
+	}
+}
+
+void ControlStr::EraseSpecial(string& str)
+{
+	// @를 못 찾을 때까지 지우기
+	while(str.find('@') != -1)
+		str.erase(find(str.begin(), str.end(), '@'));
+}
+
+void ControlStr::ReverseSpace(string& str)
+{
+	// 띄어쓰기 기준으로 나눈 뒤 substr로 ReverseStr 함수에 넘겨준다. replace를 사용해 바꾼다.
+	int first_idx = 0;
+	for (int i = 0; i < str.length(); ++i) {
+		if (str[i] == ' ') {
+			string s = str.substr(first_idx, i - first_idx);
+			ReverseStr(s);
+			str.replace(first_idx, i - first_idx, s);
+
+			// 인덱스를 띄어쓰기 다음으로 바꿈
+			first_idx = i + 1;
+		}
+	}
+
+	// 마지막 단어 처리
+	string s = str.substr(first_idx);
+	ReverseStr(s);
+	str.replace(first_idx, str.length() - first_idx, s);
+}
+
+void ControlStr::ReplaceStr(const char& changed, const char& changing, string& str)
+{
+	for (int i = 0; i < str.length(); ++i) {
+		// 바꿀 문자와 같다면
+		if (str[i] == changed)	str[i] = changing;
+	}
+}
+
+void ControlStr::Palindrome(string& str)
+{
+	// substr로 앞 뒤 문자열을 잘라서 compare로 비교
+}
 
 int CheckCommand(string* str)
 {
@@ -89,20 +124,44 @@ int CheckCommand(string* str)
 		break;
 	case 'e':
 	case 'E':
+		{
+			// e 누른 여부를 bool 값으로 판단
+			static bool is_input = false;
+			for (int i = 0; i < 10; ++i) {
+				if (!is_input)
+					control.InsertSpecial(str[i]);
+				else 
+					control.EraseSpecial(str[i]);
+			}
+			is_input = !is_input;
+		}
 		break;
 	case 'f':
 	case 'F':
+		for (int i = 0; i < 10; ++i) {
+			control.ReverseSpace(str[i]);
+		}
 		break;
 	case 'g':
 	case 'G':
-		break;
+		{
+			char changed, changing;
+			cin >> changed >> changing;
+			for (int i = 0; i < 10; ++i) {
+				control.ReplaceStr(changed, changing, str[i]);
+			}
+		}
+	break;
 	case 'h':
 	case 'H':
+		for (int i = 0; i < 10; ++i) {
+			control.Palindrome(str[i]);
+		}
 		break;
 	case '+':
-		for (int i = 0; i < 10; ++i) {
+		
 			
-		}
+
 		break;
 	case '-':
 		break;
