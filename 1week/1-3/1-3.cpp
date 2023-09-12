@@ -105,8 +105,16 @@ void ControlStr::ReplaceStr(const char& changed, const char& changing, string& s
 
 void ControlStr::Palindrome(const string& str)
 {
+	ControlStr control;
+
+	string rev = str;
+	control.ReverseStr(rev);
 	// substr로 앞 뒤 문자열을 잘라서 compare로 비교
-	
+	for (int i = 0; i < str.length() / 2; ++i) {
+		if (str[i] == rev[i])	cout << str[i];
+	}
+
+	cout << endl;
 }
 
 bool ControlStr::IsNumber(const string& str)
@@ -228,6 +236,7 @@ int CheckCommand(string* str)
 	case 'h':
 	case 'H':
 		for (int i = 0; i < 10; ++i) {
+			cout << i + 1 << "번 째 : ";
 			control.Palindrome(str[i]);
 		}
 		break;
