@@ -80,21 +80,26 @@ void Rec::ResetBoard()
 		}
 	}
 
-	////// board 넘어갔을 때
-	//if (p1.GetX() > p2.GetX()) {
-	//	for (int i = 0; i < p2.GetX(); ++i) {
-	//		for (int j = p1.GetX(); j < p2.GetY(); ++j) {
-	//			board[i][j] = 1;
-	//		}
-	//	}
-	//}
-	//if (p1.GetY() > p2.GetY()) {
-	//	for (int i = p1.GetX(); i < p1.GetX(); ++i) {
-	//		for (int j = 0; j < p2.GetY(); ++j) {
-	//			board[i][j] = 1;
-	//		}
-	//	}
-	//}
+	// 우선 보드 끝까지 표시
+	// 만약 다른 점이랑 x나 y가 겹친다면 
+	if (p1.GetX() > p2.GetX() || p1.GetY() > p2.GetY()) {
+		// 0 ~ p2
+		for (int i = 0; i < p2.GetX(); ++i) {
+			for (int j = 0; j < p2.GetY(); ++j) {
+				// p1을 기준으로 p2 사각형을 자름
+				if(j >= p1.GetY() || i >= p1.GetX())
+					board[i][j] = 1;
+			}
+		}
+		// p1 ~ BOARDSIZE
+		for (int i = p1.GetX(); i < BOARDSIZE; ++i) {
+			for (int j = p1.GetY(); j < BOARDSIZE; ++j) {
+				if (j < p2.GetY() || i < p2.GetX())
+					board[i][j] = 1;
+			}
+		}
+
+	}
 
 	// 보드에 표시
 	for (int i = p1.GetX(); i < p2.GetX(); ++i) {
@@ -157,8 +162,10 @@ void Rec::UpDownMove(const char& m)
 	else if (m == 's') {
 		// 만약 보드를 넘으면
 		if ((p1.GetX() + 1 > BOARDSIZE) || (p2.GetX() + 1 > BOARDSIZE)) {
-			p1.SetX(0);
-			p2.SetX(0);
+			if (p1.GetX() + 1 > BOARDSIZE)
+				p1.SetX(0);
+			else if (p2.GetX() + 1 > BOARDSIZE)
+				p2.SetX(0);
 		}
 		else {
 			p1.SetX(p1.GetX() + 1);
@@ -185,8 +192,10 @@ void Rec::LRMove(const char& m)
 	else if (m == 'd') {
 		// 만약 보드를 넘으면
 		if ((p1.GetY() + 1 > BOARDSIZE) || (p2.GetY() + 1 > BOARDSIZE)) {
-			p1.SetY(0);
-			p2.SetY(0);
+			if (p1.GetY() + 1 > BOARDSIZE)
+				p1.SetY(0);
+			if((p2.GetY() + 1 > BOARDSIZE))
+				p2.SetY(0);
 		}
 		else {
 			p1.SetY(p1.GetY() + 1);
