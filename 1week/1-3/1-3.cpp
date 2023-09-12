@@ -20,7 +20,7 @@ using std::string;
 • +: 문장에 있는 모든 숫자에 +1을 한다.
 • -: 문장에 있는 모든 숫자에 -1을 한다. (최소 숫자는 0, 즉 0에 -1을 해도 0으로 출력)
 • q: 프로그램 종료
-*/
+*/ 
 // string을 다루는 클래스
 class ControlStr
 {
@@ -32,8 +32,9 @@ public:
 	void EraseSpecial(string& str);
 	void ReverseSpace(string& str);
 	void ReplaceStr(const char& changed, const char& changing, string& str);
-	void Palindrome(string& str);
-	/*void NumberChange(string& str, const char& m);*/
+	void Palindrome(const string& str);
+	bool IsNumber(const string& str);
+	void NumberChange(string& str, const char& m);
 };
 
 void ControlStr::OutputStr(const string& str)
@@ -102,9 +103,81 @@ void ControlStr::ReplaceStr(const char& changed, const char& changing, string& s
 	}
 }
 
-void ControlStr::Palindrome(string& str)
+void ControlStr::Palindrome(const string& str)
 {
 	// substr로 앞 뒤 문자열을 잘라서 compare로 비교
+	
+}
+
+bool ControlStr::IsNumber(const string& str)
+{
+	for (char const& c : str) {
+		if (std::isdigit(c) == 0)
+			return false;
+	}
+
+	// 빈칸일 경우
+	if (str == "")	return false;
+
+	return true;
+}
+
+void ControlStr::NumberChange(string& str, const char& m)
+{
+	// substr로 나눈 뒤 숫자면 stoi로 숫자로 바꾸고 +나 -
+	// 띄어쓰기 인덱스 저장 후
+	ControlStr control;
+
+	int first_idx = 0;
+	for (int i = 0; i < str.length(); ++i) {
+		if (str[i] == ' ') {
+			// 단어별로 나누기
+			string s = str.substr(first_idx, i - first_idx);
+			// 숫자인지 확인
+			if (control.IsNumber(s)) {
+				int num = stoi(s);
+
+				// + or -
+				if (m == '+') {
+					num++;
+				}
+				else if (m == '-') {
+					// 0이하면 0으로
+					if (num <= 0)
+						num = 0;
+					else
+						num--;
+				}
+				// 문자열로 바꾼 후 다시 replace
+				s = std::to_string(num);
+				str.replace(first_idx, i - first_idx, s);
+			}
+			// 처음 인덱스 띄어쓰기 다음으로 초기화
+			first_idx = i + 1;
+		}
+	}
+
+	// 마지막 단어 확인
+	string s = str.substr(first_idx);
+	// 숫자인지 확인
+	if (control.IsNumber(s)) {
+		int num = stoi(s);
+
+		// + or -
+		if (m == '+') {
+			num++;
+		}
+		else if (m == '-') {
+			// 0이하면 0으로
+			if (num <= 0)
+				num = 0;
+			else
+				num--;
+		}
+		// 문자열로 바꾼 후 다시 replace
+		s = std::to_string(num);
+		str.replace(first_idx, str.length() - first_idx, s);
+	}
 }
 
 int CheckCommand(string* str)
@@ -159,11 +232,14 @@ int CheckCommand(string* str)
 		}
 		break;
 	case '+':
-		
-			
-
+		for (int i = 0; i < 10; ++i) {
+			control.NumberChange(str[i], '+');
+		}
 		break;
 	case '-':
+		for (int i = 0; i < 10; ++i) {
+			control.NumberChange(str[i], '-');
+		}
 		break;
 	case 'q':
 	case 'Q':
