@@ -14,6 +14,7 @@ using std::endl;
 • 조건 1) 경로는 한쪽 방향으로 5칸 이상 계속 이동할 수 없다.
 • 조건 2) 경로는 좌우상하로 최소한 1번 이상 방향을 전환한 적이 있어야 한다.
  => cnt로 세어서 하기
+ 주변 8칸에 2개 이상이면 다시
 
 • enter키: 새로운 경로를 만든다.
 • r: 임의의 객체 (문자)가 경로 시작칸에 나타난다. (다른 색상으로 그리기)
@@ -31,6 +32,15 @@ typedef struct way
 }WAY;
 
 int board[BOARDSIZE][BOARDSIZE];
+
+void ResetBoard()
+{
+	for (int i = 0; i < BOARDSIZE; ++i) {
+		for (int j = 0; j < BOARDSIZE; ++j) {
+			board[i][j] = 0;
+		}
+	}
+}
 
 void PrintBoard()
 {
@@ -53,8 +63,25 @@ bool IsExist(const int& r, const int& c)
 	return false;
 }
 
+bool IsAround(const int& r, const int& c)
+{
+	// 주변에 2개 이상 있는지 확인
+	int cnt = 0;
+	for (int i = -1; i < 2; ++i) {
+		for (int j = -1; j < 2; ++j) {
+			if (board[r + i][c + j] == 1)	cnt++;
+		}
+	}
+
+	if (cnt > 1)	return false;
+	else
+		return true;
+}
+
 void MakePath()
 {
+	ResetBoard();
+
 	WAY north = {}, south = {}, west = {}, east = {};
 
 	int i = 0, j = 0;
@@ -65,69 +92,85 @@ void MakePath()
 		int direct = rand() % 4;
 		if (direct == 0) {	// north
 			// 갔던 곳이 아니라면
-			if (board[i][j - 1] == 0) {
+			if (!IsExist(i, j - 1)) {
+				// 5번 연속 갔다면 다시 랜덤으로
+				if (north.cnt >= 5)
+					continue;
+
 				// 인덱스 음수 방지
-				if(j - 1 >= 0)
-					j--;
+				if (j - 1 >= 0)
+					if(IsAround(i, j - 1))
+						j--;
+				else
+					continue;
 
 				north.cnt++;
 				south.cnt = 0;
 				west.cnt = 0;
 				east.cnt = 0;
-				// 5번 연속 갔다면 다시 랜덤으로
-				if (north.cnt >= 5)
-					continue;
 
 				if(!north.is_gone)
 					north.is_gone = true;
 			}
 		}
 		else if (direct == 1) {	// south
-			if (board[i][j + 1] == 0) {
-				if (j + 1 <= BOARDSIZE - 1)
-					j++;
+			if (!IsExist(i, j + 1)) {
+				// 5번 연속 갔다면 다시 랜덤으로
+				if (south.cnt >= 5)
+					continue;
+
+				if (j + 1 <= BOARDSIZE)
+					if (IsAround(i, j + 1))
+						j++;
+				else
+					continue;
 
 				north.cnt = 0;
 				south.cnt++;
 				west.cnt = 0;
 				east.cnt = 0;
-				// 5번 연속 갔다면 다시 랜덤으로
-				if (south.cnt >= 5)
-					continue;
 
 				if (!south.is_gone)
 					south.is_gone = true;
 			}
 		}
 		else if (direct == 2) {	// west
-			if (board[i - 1][j] == 0) {
+			if (!IsExist(i - 1, j)) {
+				// 5번 연속 갔다면 다시 랜덤으로
+				if (west.cnt >= 5)
+					continue;
+
 				if (i - 1 >= 0)
-					i--;
+					if (IsAround(i - 1, j))
+						i--;
+				else
+					continue;
 
 				north.cnt = 0;
 				south.cnt = 0;
 				west.cnt++;
 				east.cnt = 0;
-				// 5번 연속 갔다면 다시 랜덤으로
-				if (west.cnt >= 5)
-					continue;
 				
 				if (!west.is_gone)
 					west.is_gone = true;
 			}
 		}
 		else if (direct == 3) {	// east
-			if (board[i + 1][j] == 0) {
-				if (i + 1 >= j + 1 <= BOARDSIZE - 1)
-					i++;
+			if (!IsExist(i + 1, j)) {
+				// 5번 연속 갔다면 다시 랜덤으로
+				if (east.cnt >= 5)
+					continue;
+
+				if (i + 1 <= BOARDSIZE)
+					if (IsAround(i + 1, j))
+						i++;
+				else
+					continue;
 
 				north.cnt = 0;
 				south.cnt = 0;
 				west.cnt = 0;
 				east.cnt++;
-				// 5번 연속 갔다면 다시 랜덤으로
-				if (east.cnt >= 5)
-					continue;
 
 				if (!east.is_gone)
 					east.is_gone = true;
@@ -135,7 +178,7 @@ void MakePath()
 		}
 
 		// 맨 오른쪽 끝으로 가면 탈출
-		if (j == BOARDSIZE || j == 0 || i == 0 || i == BOARDSIZE) {
+		if (j == BOARDSIZE ||  i == BOARDSIZE) {
 			if (!north.is_gone || !south.is_gone || !west.is_gone || !east.is_gone)	{}
 			else
 				break;

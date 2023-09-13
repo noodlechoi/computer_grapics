@@ -91,19 +91,19 @@ void Rec::ResetBoard()
 					board[i][j] = 1;
 			}
 		}
-		// 반복문에 못 들어갈 때
-		if (p2.GetX() == 0) {
-			// 0행의 p1 안부터 p2까지
-			for (int i = p1.GetY(); i <= p2.GetY(); ++i) {
-				board[0][i] = 1;
-			}
-		}
-		if (p2.GetY() == 0) {
-			// 0열의 p1 안부터 p2까지
-			for (int i = p1.GetX(); i <= p2.GetX(); ++i) {
-				board[i][0] = 1;
-			}
-		}
+		//// 반복문에 못 들어갈 때
+		//if (p2.GetX() == 0) {
+		//	// 0행의 p1 안부터 p2까지
+		//	for (int i = p1.GetY(); i <= p2.GetY(); ++i) {
+		//		board[0][i] = 1;
+		//	}
+		//}
+		//if (p2.GetY() == 0) {
+		//	// 0열의 p1 안부터 p2까지
+		//	for (int i = p1.GetX(); i <= p2.GetX(); ++i) {
+		//		board[i][0] = 1;
+		//	}
+		//}
 		// p1 ~ BOARDSIZE
 		for (int i = p1.GetX(); i < BOARDSIZE; ++i) {
 			for (int j = p1.GetY(); j < BOARDSIZE; ++j) {
@@ -111,7 +111,6 @@ void Rec::ResetBoard()
 					board[i][j] = 1;
 			}
 		}
-
 	}
 
 	// 보드에 표시

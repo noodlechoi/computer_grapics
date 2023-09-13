@@ -105,13 +105,48 @@ void ControlStr::ReplaceStr(const char& changed, const char& changing, string& s
 
 void ControlStr::Palindrome(const string& str)
 {
-	ControlStr control;
+	// 띄어쓰기 기준으로 나눈 뒤 substr로 ReverseStr 함수에 넘겨준다. 뒤바꾼 단어가 같은 부분을 출력
+	int first_idx = 0;
+	for (int i = 0; i < str.length(); ++i) {
+		if (str[i] == ' ') {
+			string s = str.substr(first_idx, i - first_idx);
+			// 문자 복사, 1 : 문자 절반, 뒤집은 문자 절반
+			string rev1 = s.substr(0, s.length());
+			string rev2 = s;
+			ReverseStr(rev2);
+			rev2.substr(0, s.length() / 2);
 
-	string rev = str;
-	control.ReverseStr(rev);
-	// substr로 앞 뒤 문자열을 잘라서 compare로 비교
-	for (int i = 0; i < str.length() / 2; ++i) {
-		if (str[i] == rev[i])	cout << str[i];
+			if (s.length() > 1) {
+				int j = 0;
+				for (; j < s.length(); ++j) {
+					if (rev1[j] != rev2[j])
+						break;
+				}
+
+				cout << rev1.substr(0, j);
+			}
+
+			// 인덱스를 띄어쓰기 다음으로 바꿈
+			first_idx = i + 1;
+		}
+	}
+
+	// 마지막 단어 처리
+	string s = str.substr(first_idx);
+	// 문자 복사, 1 : 문자 절반, 뒤집은 문자 절반
+	string rev1 = s.substr(0, s.length());
+	string rev2 = s;
+	ReverseStr(rev2);
+	rev2.substr(0, s.length() / 2);
+
+	if (s.length() > 1) {
+		int j = 0;
+		for (; j < s.length(); ++j) {
+			if (rev1[j] != rev2[j])
+				break;
+		}
+
+		cout << rev1.substr(0, j);
 	}
 
 	cout << endl;
@@ -266,7 +301,7 @@ int main()
 {
 	ControlStr control;
 	string str[10];
-
+	
 	string file_name;
 	cout << "Input file name : ";
 	cin >> file_name;
