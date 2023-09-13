@@ -91,6 +91,19 @@ void Rec::ResetBoard()
 					board[i][j] = 1;
 			}
 		}
+		// 반복문에 못 들어갈 때
+		if (p2.GetX() == 0) {
+			// 0행의 p1 안부터 p2까지
+			for (int i = p1.GetY(); i <= p2.GetY(); ++i) {
+				board[0][i] = 1;
+			}
+		}
+		if (p2.GetY() == 0) {
+			// 0열의 p1 안부터 p2까지
+			for (int i = p1.GetX(); i <= p2.GetX(); ++i) {
+				board[i][0] = 1;
+			}
+		}
 		// p1 ~ BOARDSIZE
 		for (int i = p1.GetX(); i < BOARDSIZE; ++i) {
 			for (int j = p1.GetY(); j < BOARDSIZE; ++j) {
@@ -149,10 +162,15 @@ void Rec::UpDownMove(const char& m)
 	if (m == 'w') {
 		// 만약 음수면
 		if ((p1.GetX() - 1 < 0) || (p2.GetX() - 1 < 0)) {
-			if (p1.GetX() - 1 < 0)
+			// p1이나 p2가 넘어갔을 때 나누어서 계산
+			if (p1.GetX() - 1 < 0) {
 				p1.SetX(BOARDSIZE - 1);
-			else if(p2.GetX() - 1 < 0)
+				p2.SetX(p2.GetX() - 1);
+			}
+			else if (p2.GetX() - 1 < 0) {
+				p1.SetX(p1.GetX() - 1);
 				p2.SetX(BOARDSIZE - 1);
+			}
 		}
 		else {
 			p1.SetX(p1.GetX() - 1);
@@ -162,10 +180,14 @@ void Rec::UpDownMove(const char& m)
 	else if (m == 's') {
 		// 만약 보드를 넘으면
 		if ((p1.GetX() + 1 > BOARDSIZE) || (p2.GetX() + 1 > BOARDSIZE)) {
-			if (p1.GetX() + 1 > BOARDSIZE)
+			if (p1.GetX() + 1 > BOARDSIZE) {
 				p1.SetX(0);
-			else if (p2.GetX() + 1 > BOARDSIZE)
+				p2.SetX(p2.GetX() + 1);
+			}
+			else if (p2.GetX() + 1 > BOARDSIZE) {
+				p1.SetX(p1.GetX() + 1);
 				p2.SetX(0);
+			}
 		}
 		else {
 			p1.SetX(p1.GetX() + 1);
@@ -179,10 +201,14 @@ void Rec::LRMove(const char& m)
 	if (m == 'a') {
 		// 만약 음수면
 		if ((p1.GetY() - 1 < 0) || (p2.GetY() - 1 < 0)) {
-			if (p1.GetY() - 1 < 0)
+			if (p1.GetY() - 1 < 0) {
 				p1.SetY(BOARDSIZE - 1);
-			else if (p2.GetY() - 1 < 0)
+				p2.SetY(p2.GetY() - 1);
+			}
+			else if (p2.GetY() - 1 < 0) {
+				p1.SetY(p1.GetY() - 1);
 				p2.SetY(BOARDSIZE - 1);
+			}
 		}
 		else {
 			p1.SetY(p1.GetY() - 1);
@@ -192,10 +218,14 @@ void Rec::LRMove(const char& m)
 	else if (m == 'd') {
 		// 만약 보드를 넘으면
 		if ((p1.GetY() + 1 > BOARDSIZE) || (p2.GetY() + 1 > BOARDSIZE)) {
-			if (p1.GetY() + 1 > BOARDSIZE)
+			if (p1.GetY() + 1 > BOARDSIZE) {
 				p1.SetY(0);
-			if((p2.GetY() + 1 > BOARDSIZE))
+				p2.SetY(p2.GetY() + 1);
+			}
+			if ((p2.GetY() + 1 > BOARDSIZE)) {
+				p1.SetY(p1.GetY() + 1);
 				p2.SetY(0);
+			}
 		}
 		else {
 			p1.SetY(p1.GetY() + 1);
