@@ -250,15 +250,18 @@ void ListCommad::CompareDis(const char& m)
 
 void ListCommad::BubbleAscending()
 {
-	for (NODE* p = head; p->next != NULL; p = p->next) {
+	for (NODE* p = head; p != NULL; p = p->next) {
 		int dis1 = (p->data.x) * (p->data.x) + (p->data.y) * (p->data.y) + (p->data.z) * (p->data.z);
-		for (NODE* q = p->next; q->next != NULL; q = q->next) {
+		for (NODE* q = p->next; q != NULL; q = q->next) {
 			int dis2 = (q->data.x) * (q->data.x) + (q->data.y) * (q->data.y) + (q->data.z) * (q->data.z);
 			// 왼쪽 수가 오른쪽 보다 크면 값 교환
 			if (dis1 > dis2) {
 				POS tmp = { p->data.x, p->data.y, p->data.z };
 				p->data = { q->data.x, q->data.y, q->data.z };
 				q->data = { tmp.x, tmp.y, tmp.z };
+
+				// 값이 변하면 다시
+				dis1 = (p->data.x) * (p->data.x) + (p->data.y) * (p->data.y) + (p->data.z) * (p->data.z);
 			}
 		}
 	}
@@ -266,15 +269,18 @@ void ListCommad::BubbleAscending()
 
 void ListCommad::BubbleDescending()
 {
-	for (NODE* p = head; p->next != NULL; p = p->next) {
+	for (NODE* p = head; p != NULL; p = p->next) {
 		int dis1 = (p->data.x) * (p->data.x) + (p->data.y) * (p->data.y) + (p->data.z) * (p->data.z);
-		for (NODE* q = p->next; q->next != NULL; q = q->next) {
+		for (NODE* q = p->next; q != NULL; q = q->next) {
 			int dis2 = (q->data.x) * (q->data.x) + (q->data.y) * (q->data.y) + (q->data.z) * (q->data.z);
 			// 오른쪽 수가 왼쪽 보다 크면 값 교환
 			if (dis1 < dis2) {
 				POS tmp = { p->data.x, p->data.y, p->data.z };
 				p->data = { q->data.x, q->data.y, q->data.z };
 				q->data = { tmp.x, tmp.y, tmp.z };
+
+				// 값이 변하면 다시
+				dis1 = (p->data.x) * (p->data.x) + (p->data.y) * (p->data.y) + (p->data.z) * (p->data.z);
 			}
 		}
 	}
@@ -287,10 +293,9 @@ ListCommad& ListCommad::operator=(const ListCommad& c)
 		DeleteNode('d');
 
 	NODE* p = NULL;
-	for (p = c.head; p->next != NULL; p = p->next) {
+	for (p = c.head; p != NULL; p = p->next) {
 		InsertNode(p->data, '+');
 	}
-	InsertNode(p->data, '+');
 
 	return *this;
 }
@@ -298,6 +303,8 @@ ListCommad& ListCommad::operator=(const ListCommad& c)
 
 // 원래 노드 저장
 ListCommad copy;
+bool is_a = false;
+bool is_s = false;
 
 int CheckCommand(ListCommad& c)
 {
@@ -309,6 +316,10 @@ int CheckCommand(ListCommad& c)
 	case 'd':
 	case 'D':
 		c.DeleteNode('d');
+
+		// 정렬 후 삭제하거나 추가 후에는 되돌리기 X
+		if (is_a)	is_a = false;
+		if (is_s)	is_s = false;
 		break;
 	case 'e':
 	case 'E':
@@ -316,6 +327,9 @@ int CheckCommand(ListCommad& c)
 		POS p;
 		cin >> p.x >> p.y >> p.z;
 		c.InsertNode(p, 'e');
+
+		if (is_a)	is_a = false;
+		if (is_s)	is_s = false;
 	}
 	break;
 	case 'l':
@@ -337,7 +351,6 @@ int CheckCommand(ListCommad& c)
 	case 'a':
 	case 'A':
 	{
-		static bool is_a = false;
 		if (!is_a) {
 			copy = c;
 			c.BubbleAscending();
@@ -352,7 +365,6 @@ int CheckCommand(ListCommad& c)
 	case 's':
 	case 'S':
 	{
-		static bool is_s = false;
 		if (!is_s) {
 			copy = c;
 			c.BubbleDescending();
@@ -369,10 +381,15 @@ int CheckCommand(ListCommad& c)
 		POS p;
 		cin >> p.x >> p.y >> p.z;
 		c.InsertNode(p, '+');
+
+		if (is_a)	is_a = false;
+		if (is_s)	is_s = false;
 	}
 		break;
 	case '-':
 		c.DeleteNode('-');
+		if (is_a)	is_a = false;
+		if (is_s)	is_s = false;
 		break;
 	case 'q':
 	case 'Q':
