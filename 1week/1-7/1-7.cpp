@@ -42,6 +42,17 @@ void PrintBoard()
 	}
 }
 
+bool IsExist(const int& r, const int& c)
+{
+	for (int i = 0; i < BOARDSIZE; ++i) {
+		for (int j = 0; j < BOARDSIZE; ++j) {
+			if (board[r][c] == board[i][j])	return true;
+		}
+	}
+
+	return false;
+}
+
 void MakePath()
 {
 	WAY north = {}, south = {}, west = {}, east = {};
@@ -54,7 +65,7 @@ void MakePath()
 		int direct = rand() % 4;
 		if (direct == 0) {	// north
 			// 갔던 곳이 아니라면
-			if (board[i][j - 1] != 1) {
+			if (board[i][j - 1] == 0) {
 				// 인덱스 음수 방지
 				if(j - 1 >= 0)
 					j--;
@@ -72,7 +83,7 @@ void MakePath()
 			}
 		}
 		else if (direct == 1) {	// south
-			if (board[i][j + 1] != 1) {
+			if (board[i][j + 1] == 0) {
 				if (j + 1 <= BOARDSIZE - 1)
 					j++;
 
@@ -89,7 +100,7 @@ void MakePath()
 			}
 		}
 		else if (direct == 2) {	// west
-			if (board[i - 1][j] != 1) {
+			if (board[i - 1][j] == 0) {
 				if (i - 1 >= 0)
 					i--;
 
@@ -106,7 +117,7 @@ void MakePath()
 			}
 		}
 		else if (direct == 3) {	// east
-			if (board[i + 1][j] != 1) {
+			if (board[i + 1][j] == 0) {
 				if (i + 1 >= j + 1 <= BOARDSIZE - 1)
 					i++;
 
@@ -124,8 +135,13 @@ void MakePath()
 		}
 
 		// 맨 오른쪽 끝으로 가면 탈출
-		if (j == BOARDSIZE - 1) break;
+		if (j == BOARDSIZE || j == 0 || i == 0 || i == BOARDSIZE) {
+			if (!north.is_gone || !south.is_gone || !west.is_gone || !east.is_gone)	{}
+			else
+				break;
+		}
 	}
+
 }
 
 int main()
