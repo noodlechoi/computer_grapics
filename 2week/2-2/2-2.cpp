@@ -47,13 +47,13 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	// 사각형 좌표 배열 초기화, 원도우 중심을 원점으로 하여 사분면 계산
 	for (int i = 0; i < 8; ++i) {
 		if (i % 4 == 0)
-			r[i] = {0, 0, WIDTH / 2, HEIGHT / 2};
+			r[i] = {0.0f, 0.0f, 1.0f, 1.0f};
 		else if(i % 4 == 1)
-			r[i] = { -WIDTH / 2, 0, 0,  HEIGHT / 2 };
+			r[i] = { -1.0f, 0.0f, 0.0f,  1.0f };
 		else if (i % 4 == 2)
-			r[i] = { -WIDTH / 2, -HEIGHT / 2, 0, 0 };
+			r[i] = { -1.0f, -1.0f, 0.0f, 0.0f };
 		else if (i % 4 == 3)
-			r[i] = { 0, -HEIGHT / 2, WIDTH / 2, 0 };
+			r[i] = { 0.0f, -1.0f, 1.0f, 0.0f };
 		// 색깔 설정
 		for (int j = 0; j < 3; ++j)
 			color[i][j] = fmod(rand(), 0.9f);
@@ -90,7 +90,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 
 GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 {
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		// 사각형 생성
 		glRectf(r[i].x1, r[i].y1, r[i].x2, r[i].y2);
 		// 사각형 색깔 설정
@@ -109,9 +109,9 @@ GLvoid Mouse(int button, int state, int x, int y)
 {
 	// 만약 내부에 있는 사각형이 먼저 충돌 됐으면 외부 사각형은 비교 X
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		for (int i = 0; i < 8; ++i) {
+		for (int i = 0; i < 4; ++i) {
 			// 충돌 체크
-			if (x >= r[i].x1 && x <= r[i].x2 && y >= r[i].y1 && y <= r[i].y2) {
+			if (x / static_cast<float>(WIDTH) >= r[i].x1 && x / static_cast<float>(WIDTH) <= r[i].x2 && y / static_cast<float>(HEIGHT) >= r[i].y1 && y / static_cast<float>(HEIGHT) <= r[i].y2) {
 				for (int j = 0; j < 3; ++j)
 					color[i][j] = fmod(rand(), 0.9f);
 			}
