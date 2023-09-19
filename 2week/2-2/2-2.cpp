@@ -3,8 +3,12 @@
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
 
+#define WIDTH 800
+#define HIEGHT 600
+
 GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
+GLvoid Mouse(int button, int state, int x, int y);
 
 int winID;
 
@@ -13,8 +17,8 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	glutInit(&argc, argv); // glut 초기화
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // 디스플레이 모드 설정
 	glutInitWindowPosition(100, 100); // 윈도우의 위치 지정
-	glutInitWindowSize(800, 600); // 윈도우의 크기 지정
-	winID = glutCreateWindow("실습 1"); // 윈도우 생성(윈도우 이름)
+	glutInitWindowSize(WIDTH, HIEGHT); // 윈도우의 크기 지정
+	winID = glutCreateWindow("실습 2"); // 윈도우 생성(윈도우 이름)
 
 	//--- GLEW 초기화하기
 	glewExperimental = GL_TRUE;
@@ -26,8 +30,13 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	else
 		std::cout << "GLEW Initialized\n";
 
+	// 배경을 한번만 그림
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	glutDisplayFunc(drawScene); // 출력 함수의 지정
 	glutReshapeFunc(Reshape); // 다시 그리기 함수 지정
+	//glutMouseFunc(Mouse);
 	glutMainLoop(); // 이벤트 처리 시작
 }
 
@@ -41,6 +50,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
  오른쪽 마우스 클릭
  사각형 내부 클릭: 사각형 크기 축소
  사각형 외부 클릭: 사각형 크기 확대
+=> 같은 색의 사각형 하나 더 위에 만들기
  사각형 그리기 함수
  void glRectf (Glfloat x1, Glfloat y1, Glfloat x2, Glfloat y2);
  (x1, y1): 좌측 하단 좌표값
@@ -55,13 +65,18 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 
 GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 {
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f); // 바탕색을 ‘blue’ 로 지정
-	glClear(GL_COLOR_BUFFER_BIT); // 설정된 색으로 전체를 칠하기
-	// 그리기 부분 구현: 그리기 관련 부분이 여기에 포함된다.
+	glRectf(0, 0, WIDTH / 2, HIEGHT / 2);
+	glColor3f(0.0f, 1.0f, 1.0f);
+
 	glutSwapBuffers(); // 화면에 출력하기
 }
 
 GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 {
 	glViewport(0, 0, w, h);
+}
+
+GLvoid Mouse(int button, int state, int x, int y)
+{
+
 }
