@@ -49,11 +49,11 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 		if (i % 4 == 0)
 			r[i] = {0, 0, WIDTH / 2, HEIGHT / 2};
 		else if(i % 4 == 1)
-			r[i] = { 0, 0, -WIDTH / 2, HEIGHT / 2 };
+			r[i] = { -WIDTH / 2, 0, 0,  HEIGHT / 2 };
 		else if (i % 4 == 2)
-			r[i] = { 0, 0, -WIDTH / 2, -HEIGHT / 2 };
+			r[i] = { -WIDTH / 2, -HEIGHT / 2, 0, 0 };
 		else if (i % 4 == 3)
-			r[i] = { 0, 0, WIDTH / 2, -HEIGHT / 2 };
+			r[i] = { 0, -HEIGHT / 2, WIDTH / 2, 0 };
 		// 색깔 설정
 		for (int j = 0; j < 3; ++j)
 			color[i][j] = fmod(rand(), 0.9f);
@@ -111,7 +111,7 @@ GLvoid Mouse(int button, int state, int x, int y)
 	if (button == GLUT_LEFT_BUTTON) {
 		// 내부 사각형
 		for (int i = 0; i < 8; ++i) {
-
+			// 충돌 체크
 		}
 	}
 	else if (button == GLUT_RIGHT_BUTTON) {
