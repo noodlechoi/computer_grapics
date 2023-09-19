@@ -46,7 +46,9 @@ void PrintBoard()
 {
 	for (int i = 0; i < BOARDSIZE; ++i) {
 		for (int j = 0; j < BOARDSIZE; ++j) {
-			cout << board[i][j] << " ";
+			if (board[i][j] == 0) cout << "." << " ";
+			else
+				cout << board[i][j] << " ";
 		}
 		cout << endl;
 	}
@@ -67,11 +69,11 @@ bool IsAround(const int& r, const int& c)
 {
 	// 주변에 2개 이상 있는지 확인
 	int cnt = 0;
-	for (int i = -1; i < 2; ++i) {
-		for (int j = -1; j < 2; ++j) {
-			if (board[r + i][c + j] == 1)	cnt++;
-		}
-	}
+
+	if (board[r - 1][c] == 1) cnt++;
+	if (board[r][c - 1] == 1) cnt++;
+	if (board[r + 1][c] == 1) cnt++;
+	if (board[r][c + 1] == 1) cnt++;
 
 	if (cnt > 1)	return false;
 	else
@@ -91,16 +93,13 @@ void MakePath()
 		// 방향 랜덤으로 정하기
 		int direct = rand() % 4;
 		if (direct == 0) {	// north
-			// 갔던 곳이 아니라면
-			if (!IsExist(i, j - 1)) {
-				// 5번 연속 갔다면 다시 랜덤으로
-				if (north.cnt >= 5)
-					continue;
+			// 주변에 길이 하나밖에 없다면
+			if (i - 1 >= 0) {
+				// 4번 연속 갔다면 다시 랜덤으로
+				if (north.cnt >= 4)	continue;
 
-				// 인덱스 음수 방지
-				if (j - 1 >= 0)
-					if(IsAround(i, j - 1))
-						j--;
+				// 범위가 보드 안이면
+				if (IsAround(i - 1, j))	i--;
 				else
 					continue;
 
@@ -109,19 +108,17 @@ void MakePath()
 				west.cnt = 0;
 				east.cnt = 0;
 
-				if(!north.is_gone)
+				if (!north.is_gone)
 					north.is_gone = true;
 			}
 		}
 		else if (direct == 1) {	// south
-			if (!IsExist(i, j + 1)) {
-				// 5번 연속 갔다면 다시 랜덤으로
-				if (south.cnt >= 5)
-					continue;
+			if (i + 1 <= BOARDSIZE) {
+				// 4번 연속 갔다면 다시 랜덤으로
+				if (south.cnt >= 4)	continue;
 
-				if (j + 1 <= BOARDSIZE)
-					if (IsAround(i, j + 1))
-						j++;
+				// 범위가 보드 안이면
+				if (IsAround(i + 1, j))	i++;
 				else
 					continue;
 
@@ -135,14 +132,12 @@ void MakePath()
 			}
 		}
 		else if (direct == 2) {	// west
-			if (!IsExist(i - 1, j)) {
-				// 5번 연속 갔다면 다시 랜덤으로
-				if (west.cnt >= 5)
-					continue;
+			if (j - 1 >= 0) {
+				// 4번 연속 갔다면 다시 랜덤으로
+				if (west.cnt >= 4)	continue;
 
-				if (i - 1 >= 0)
-					if (IsAround(i - 1, j))
-						i--;
+				// 범위가 보드 안이면
+				if (IsAround(i, j - 1))	j--;
 				else
 					continue;
 
@@ -150,20 +145,18 @@ void MakePath()
 				south.cnt = 0;
 				west.cnt++;
 				east.cnt = 0;
-				
+
 				if (!west.is_gone)
 					west.is_gone = true;
 			}
 		}
 		else if (direct == 3) {	// east
-			if (!IsExist(i + 1, j)) {
-				// 5번 연속 갔다면 다시 랜덤으로
-				if (east.cnt >= 5)
-					continue;
+			if (j + 1 <= BOARDSIZE) {
+				// 4번 연속 갔다면 다시 랜덤으로
+				if (east.cnt >= 4)	continue;
 
-				if (i + 1 <= BOARDSIZE)
-					if (IsAround(i + 1, j))
-						i++;
+				// 범위가 보드 안이면
+				if (IsAround(i, j + 1))	j++;
 				else
 					continue;
 
@@ -178,10 +171,12 @@ void MakePath()
 		}
 
 		// 맨 오른쪽 끝으로 가면 탈출
-		if (j == BOARDSIZE ||  i == BOARDSIZE) {
+		if (j == BOARDSIZE || i == BOARDSIZE || i == 0 || j == 0) {
 			if (!north.is_gone || !south.is_gone || !west.is_gone || !east.is_gone)	{}
-			else
+			else {
+				if (i == 0 || j == 0)	board[i][j] == 1;
 				break;
+			}
 		}
 	}
 
