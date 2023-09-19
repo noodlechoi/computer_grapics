@@ -108,14 +108,18 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	// 만약 내부에 있는 사각형이 먼저 충돌 됐으면 외부 사각형은 비교 X
-	if (button == GLUT_LEFT_BUTTON) {
-		// 내부 사각형
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 		for (int i = 0; i < 8; ++i) {
 			// 충돌 체크
+			if (x >= r[i].x1 && x <= r[i].x2 && y >= r[i].y1 && y <= r[i].y2) {
+				for (int j = 0; j < 3; ++j)
+					color[i][j] = fmod(rand(), 0.9f);
+			}
 		}
 	}
-	else if (button == GLUT_RIGHT_BUTTON) {
+	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
 
 	}
 
+	glutPostRedisplay(); //--- 배경색이 바뀔 때마다 출력 콜백 함수를 호출하여 화면을 refresh 한다,
 }
