@@ -1,49 +1,104 @@
-#include <iostream>
-#include <gl/glew.h> //--- ÇÊ¿äÇÑ Çì´õÆÄÀÏ include
+ï»¿#include <iostream>
+#include <ctime>
+#include <cmath>
+#include <gl/glew.h> //--- í•„ìš”í•œ í—¤ë”íŒŒì¼ include
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
+
+
+
+template <typename T>
+class Rect
+{
+private:
+	// ì›ì 
+	T x, y;
+	double color[3];
+	bool is_alive;
+	T size;
+public:
+	Rect();
+	void DrawRect();
+	void Move(T x, T y);
+};
+
+template <typename T>
+Rect<T>::Rect() : x{}, y{}, is_alive {}, size{0.1f}
+{
+	// ìƒ‰ ëœë¤ ìƒ‰ìœ¼ë¡œ ì´ˆê¸°í™”
+	for (int i = 0; i < 3; ++i)
+		color[i] = fmod(rand(), 0.9f);
+}
+
+template <typename T>
+void Rect<T>::DrawRect()
+{
+	glRectf(x - size, y - size, x + size, y + size);
+	glColor3f(color[0], color[1], color[2]);
+}
+
+template <typename T>
+void Rect<T>::Move(T x, T y)
+{
+	this->x = x;
+	this->y = y;
+}
 
 GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
 
 int winID;
+template <typename T>
+Rect<T> r;
 
-void main(int argc, char** argv) //--- À©µµ¿ì Ãâ·ÂÇÏ°í Äİ¹éÇÔ¼ö ¼³Á¤
-{ //--- À©µµ¿ì »ı¼ºÇÏ±â
-	glutInit(&argc, argv); // glut ÃÊ±âÈ­
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // µğ½ºÇÃ·¹ÀÌ ¸ğµå ¼³Á¤
-	glutInitWindowPosition(100, 100); // À©µµ¿ìÀÇ À§Ä¡ ÁöÁ¤
-	glutInitWindowSize(800, 600); // À©µµ¿ìÀÇ Å©±â ÁöÁ¤
-	winID = glutCreateWindow("½Ç½À 1"); // À©µµ¿ì »ı¼º(À©µµ¿ì ÀÌ¸§)
+void main(int argc, char** argv) //--- ìœˆë„ìš° ì¶œë ¥í•˜ê³  ì½œë°±í•¨ìˆ˜ ì„¤ì •
+{ //--- ìœˆë„ìš° ìƒì„±í•˜ê¸°
+	glutInit(&argc, argv); // glut ì´ˆê¸°í™”
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // ë””ìŠ¤í”Œë ˆì´ ëª¨ë“œ ì„¤ì •
+	glutInitWindowPosition(100, 100); // ìœˆë„ìš°ì˜ ìœ„ì¹˜ ì§€ì •
+	glutInitWindowSize(800, 600); // ìœˆë„ìš°ì˜ í¬ê¸° ì§€ì •
+	winID = glutCreateWindow("ì‹¤ìŠµ 3"); // ìœˆë„ìš° ìƒì„±(ìœˆë„ìš° ì´ë¦„)
 
-	//--- GLEW ÃÊ±âÈ­ÇÏ±â
+	//--- GLEW ì´ˆê¸°í™”í•˜ê¸°
 	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK) // glew ÃÊ±âÈ­
+	if (glewInit() != GLEW_OK) // glew ì´ˆê¸°í™”
 	{
 		std::cerr << "Unable to initialize GLEW" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	else
 		std::cout << "GLEW Initialized\n";
+	// ëœë¤ ì‹œë“œ ì„¤ì •
+	srand((unsigned int)time(NULL));
 
-	glutDisplayFunc(drawScene); // Ãâ·Â ÇÔ¼öÀÇ ÁöÁ¤
-	glutReshapeFunc(Reshape); // ´Ù½Ã ±×¸®±â ÇÔ¼ö ÁöÁ¤
-	glutMainLoop(); // ÀÌº¥Æ® Ã³¸® ½ÃÀÛ
+	glutDisplayFunc(drawScene); // ì¶œë ¥ í•¨ìˆ˜ì˜ ì§€ì •
+	glutReshapeFunc(Reshape); // ë‹¤ì‹œ ê·¸ë¦¬ê¸° í•¨ìˆ˜ ì§€ì •
+	glutMainLoop(); // ì´ë²¤íŠ¸ ì²˜ë¦¬ ì‹œì‘
 }
 
 /*
+ì‚¬ê°í˜• ì´ë™í•˜ê¸°
+ï‚– í™”ë©´ ì¤‘ì•™ì— ì‚¬ê°í˜•ì„ ê·¸ë¦° í›„,
+ï‚– ë§ˆìš°ìŠ¤ ë²„íŠ¼ì„ ì‚¬ê°í˜• ìœ„ì— í´ë¦­í•œ ì±„ë¡œ ë“œë˜ê·¸ í•˜ë©´
+ï‚– ì‚¬ê°í˜•ì˜ ìœ„ì¹˜ê°€ ì´ë™ëœë‹¤.
+ï‚– ë§ˆìš°ìŠ¤ë¥¼ ë†“ìœ¼ë©´ ë” ì´ìƒ ì‚¬ê°í˜•ì´ ì´ë™í•˜ì§€ ì•ŠëŠ”ë‹¤.
+ï‚– í‚¤ë³´ë“œë¥¼ ëˆŒëŸ¬ ì‚¬ê°í˜•ì„ ì¶”ê°€ë¡œ ë§Œë“ ë‹¤.
+ï‚– í‚¤ë³´ë“œ a: í™”ë©´ì˜ ëœë¤í•œ ìœ„ì¹˜ì— ë‹¤ë¥¸ ìƒ‰ìƒì˜ ì‚¬ê°í˜•ì„ ë§Œë“ ë‹¤. ìµœëŒ€ 5ê°œ ë§Œë“ ë‹¤. ìƒˆë¡­ê²Œ ë§Œë“  ì‚¬ê°í˜•ë„ ì´ë™í•  ìˆ˜ ìˆë‹¤.
+ï‚– ì‚¬ê°í˜•ì´ ê²¹ì³ì ¸ ìˆìœ¼ë©´ ë‚˜ì¤‘ì— ë§Œë“  ì‚¬ê°í˜•ì´ ìœ„ì— ì˜¬ë¼ì˜¤ê³  ê·¸ ì‚¬ê°í˜•ì´ ì„ íƒëœë‹¤
 
+ì‚¬ê°í˜• í´ë˜ìŠ¤, ê·¸ê²ƒì„ ë‹¤ë£¨ëŠ” í´ë˜ìŠ¤ ë”°ë¡œ ë§Œë“¤ê¸°
 */
 
-GLvoid drawScene() //--- Äİ¹é ÇÔ¼ö: ±×¸®±â Äİ¹é ÇÔ¼ö
+GLvoid drawScene() //--- ì½œë°± í•¨ìˆ˜: ê·¸ë¦¬ê¸° ì½œë°± í•¨ìˆ˜
 {
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f); // ¹ÙÅÁ»öÀ» ¡®blue¡¯ ·Î ÁöÁ¤
-	glClear(GL_COLOR_BUFFER_BIT); // ¼³Á¤µÈ »öÀ¸·Î ÀüÃ¼¸¦ Ä¥ÇÏ±â
-	// ±×¸®±â ºÎºĞ ±¸Çö: ±×¸®±â °ü·Ã ºÎºĞÀÌ ¿©±â¿¡ Æ÷ÇÔµÈ´Ù.
-	glutSwapBuffers(); // È­¸é¿¡ Ãâ·ÂÇÏ±â
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // ë°”íƒ•ìƒ‰ì„ â€˜blueâ€™ ë¡œ ì§€ì •
+	glClear(GL_COLOR_BUFFER_BIT); // ì„¤ì •ëœ ìƒ‰ìœ¼ë¡œ ì „ì²´ë¥¼ ì¹ í•˜ê¸°
+	r<double>.DrawRect();
+
+	glutSwapBuffers(); // í™”ë©´ì— ì¶œë ¥í•˜ê¸°
 }
 
-GLvoid Reshape(int w, int h) //--- Äİ¹é ÇÔ¼ö: ´Ù½Ã ±×¸®±â Äİ¹é ÇÔ¼ö
+GLvoid Reshape(int w, int h) //--- ì½œë°± í•¨ìˆ˜: ë‹¤ì‹œ ê·¸ë¦¬ê¸° ì½œë°± í•¨ìˆ˜
 {
 	glViewport(0, 0, w, h);
 }
