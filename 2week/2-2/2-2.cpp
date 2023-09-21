@@ -36,8 +36,8 @@ void SetColor(Rect& r)
 
 void DrawRect(const Rect& r)
 {
-	glRectf(r.p.x - r.size, r.p.y - r.size, r.p.x + r.size, r.p.y + r.size);
 	glColor3f(r.color[0], r.color[1], r.color[2]);
+	glRectf(r.p.x - r.size, r.p.y - r.size, r.p.x + r.size, r.p.y + r.size);
 }
 
 void SetPoint()
