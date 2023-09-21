@@ -8,9 +8,15 @@
 #define WIDTH 800
 #define HEIGHT 600
 
+typedef struct Point
+{
+	float x, y;
+}Point;
+
 typedef struct Rect
 {
-	GLfloat x1, y1, x2, y2;
+	Point p;
+	float color[3];
 }Rect;
 
 GLvoid drawScene(GLvoid);
@@ -18,10 +24,46 @@ GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
 
 int winID;
+const float size = 0.5f;
+Rect r[4];
 
-// 내부 : 0 ~ 3, 외부 : 4 ~ 7
-Rect r[8];
-double color[8][3];
+void SetColor(Rect& r)
+{
+	for (int i = 0; i < 3; ++i) {
+		r.color[i] = fmod(rand(), 0.9f);
+	}
+}
+
+void SetPoint()
+{
+	r[0].p = { -0.5f, 0.5f };
+	r[1].p = { 0.5f, 0.5f };
+	r[2].p = { -0.5f, -0.5f };
+	r[3].p = { 0.5f, -0.5f };
+}
+
+void DrawRect(const Rect& r)
+{
+	glRectf(r.p.x - size, r.p.y - size, r.p.x + size, r.p.y + size);
+	glColor3f(r.color[0], r.color[1], r.color[2]);
+}
+
+Point ConvertPoint(const int& x, const int& y)
+{
+	Point tmp;
+	tmp.x = (double)((x - (double)WIDTH / 2.0) * (double)(1.0 / (double)(WIDTH / 2.0)));
+	tmp.y = -(double)((y - (double)HEIGHT / 2.0) * (double)(1.0 / (double)(HEIGHT / 2.0)));
+
+	return tmp;
+}
+
+bool Conflict(const Rect& r, const int& x, const int& y)
+{
+	if (ConvertPoint(x, y).x <= r.p.x + size && ConvertPoint(x, y).x >= r.p.x - size && ConvertPoint(x, y).y <= r.p.y + size && ConvertPoint(x, y).y >= r.p.y - size)
+		return true;
+	else
+		return false;
+}
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 { //--- 윈도우 생성하기
@@ -44,20 +86,10 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	// 랜덤 시드 설정
 	srand((unsigned int)time(NULL));
 
-	// 사각형 좌표 배열 초기화, 원도우 중심을 원점으로 하여 사분면 계산
-	for (int i = 0; i < 8; ++i) {
-		if (i % 4 == 0)
-			r[i] = {0.0f, 0.0f, 1.0f, 1.0f};
-		else if(i % 4 == 1)
-			r[i] = { -1.0f, 0.0f, 0.0f,  1.0f };
-		else if (i % 4 == 2)
-			r[i] = { -1.0f, -1.0f, 0.0f, 0.0f };
-		else if (i % 4 == 3)
-			r[i] = { 0.0f, -1.0f, 1.0f, 0.0f };
-		// 색깔 설정
-		for (int j = 0; j < 3; ++j)
-			color[i][j] = fmod(rand(), 0.9f);
+	for (int i = 0; i < 4; ++i) {
+		SetColor(r[i]);
 	}
+	SetPoint();
 
 	glutDisplayFunc(drawScene); // 출력 함수의 지정
 	glutReshapeFunc(Reshape); // 다시 그리기 함수 지정
@@ -91,10 +123,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 {
 	for (int i = 0; i < 4; ++i) {
-		// 사각형 생성
-		glRectf(r[i].x1, r[i].y1, r[i].x2, r[i].y2);
-		// 사각형 색깔 설정
-		glColor3f(color[i][0], color[i][1], color[i][2]);
+		DrawRect(r[i]);
 	}
 
 	glutSwapBuffers(); // 화면에 출력하기
@@ -107,19 +136,12 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 
 GLvoid Mouse(int button, int state, int x, int y)
 {
-	// 만약 내부에 있는 사각형이 먼저 충돌 됐으면 외부 사각형은 비교 X
-	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+	if (button == GLUT_LEFT_BUTTON && button == GLUT_DOWN) {
 		for (int i = 0; i < 4; ++i) {
-			// 충돌 체크
-			if (x / static_cast<float>(WIDTH) >= r[i].x1 && x / static_cast<float>(WIDTH) <= r[i].x2 && y / static_cast<float>(HEIGHT) >= r[i].y1 && y / static_cast<float>(HEIGHT) <= r[i].y2) {
-				for (int j = 0; j < 3; ++j)
-					color[i][j] = fmod(rand(), 0.9f);
+			if (Conflict(r[i], x, y)) {
+				SetColor(r[i]);
+				break;
 			}
 		}
 	}
-	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-
-	}
-
-	glutPostRedisplay(); //--- 배경색이 바뀔 때마다 출력 콜백 함수를 호출하여 화면을 refresh 한다,
 }

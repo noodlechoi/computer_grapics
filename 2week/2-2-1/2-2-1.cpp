@@ -5,9 +5,10 @@
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
 
-
 #define WIDTH 800
 #define HEIGHT 600
+
+int p;
 
 // 사각형 클래스
 template <typename T>
@@ -35,12 +36,6 @@ public:
 	}
 	void Reset()
 	{
-		// 랜덤 시드 설정
-		srand((unsigned int)time(NULL));
-
-		// 위치 랜덤 생성
-		x = fmod(rand(), 0.9f);
-		y = fmod(rand(), 0.9f);
 		// 색 랜덤 색으로 초기화
 		for (int i = 0; i < 3; ++i)
 			color[i] = fmod(rand(), 0.9f);
@@ -61,19 +56,33 @@ public:
 		else
 			return false;
 	}
-	void AddRect(int& idx)
-	{
-		if (idx < 5) {
-			is_alive = true;
-			this->Reset();
-			idx++;
-		}
-	}
 };
 
 template <typename T>
-Rect<T>::Rect() : x{}, y{}, is_alive {}, size{ 0.1f }
-{}
+Rect<T>::Rect() : x{}, y{}, is_alive{}, size{ 0.5f }
+{
+	// 1 사분면
+	if (p % 4 == 0) {
+		x += size;
+		y += size;
+	}
+	// 2 사분면
+	else if (p % 4 == 1) {
+		x -= size;
+		y += size;
+	}
+	// 3 사분면
+	else if (p % 4 == 2) {
+		x -= size;
+		y -= size;
+	}
+	// 4 사분면
+	else if (p % 4 == 3) {
+		x += size;
+		y -= size;
+	}
+	p++;
+}
 
 template <typename T>
 void Rect<T>::DrawRect()
@@ -92,14 +101,11 @@ void Rect<T>::Move(const T& x, const T& y)
 GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
-GLvoid Motion(int x, int y);
 
 int winID;
-template <typename T>
-Rect<T> r[5];
-bool left_button;
-int idx;
-GLvoid Keyboard(unsigned char key, int x, int y);
+
+// 내부 : 0 ~ 3, 외부 : 4 ~ 7
+Rect<double> r[8];
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 { //--- 윈도우 생성하기
@@ -107,7 +113,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // 디스플레이 모드 설정
 	glutInitWindowPosition(100, 100); // 윈도우의 위치 지정
 	glutInitWindowSize(WIDTH, HEIGHT); // 윈도우의 크기 지정
-	winID = glutCreateWindow("실습 3"); // 윈도우 생성(윈도우 이름)
+	winID = glutCreateWindow("실습 2"); // 윈도우 생성(윈도우 이름)
 
 	//--- GLEW 초기화하기
 	glewExperimental = GL_TRUE;
@@ -118,38 +124,47 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	}
 	else
 		std::cout << "GLEW Initialized\n";
-	
+
+	// 랜덤 시드 설정
+	srand((unsigned int)time(NULL));
+	for (int i = 0; i < 8; ++i) {
+		r[i].Reset();
+	}
 
 	glutDisplayFunc(drawScene); // 출력 함수의 지정
 	glutReshapeFunc(Reshape); // 다시 그리기 함수 지정
 	glutMouseFunc(Mouse);
-	glutMotionFunc(Motion);
-	glutKeyboardFunc(Keyboard);
 	glutMainLoop(); // 이벤트 처리 시작
 }
 
 /*
-사각형 이동하기
- 화면 중앙에 사각형을 그린 후,
- 마우스 버튼을 사각형 위에 클릭한 채로 드래그 하면
- 사각형의 위치가 이동된다.
- 마우스를 놓으면 더 이상 사각형이 이동하지 않는다.
- 키보드를 눌러 사각형을 추가로 만든다.
- 키보드 a: 화면의 랜덤한 위치에 다른 색상의 사각형을 만든다. 최대 5개 만든다. 새롭게 만든 사각형도 이동할 수 있다.
- 사각형이 겹쳐져 있으면 나중에 만든 사각형이 위에 올라오고 그 사각형이 선택된다
-
-사각형 클래스, 그것을 다루는 클래스 따로 만들기
+윈도우를 띄우고 마우스 명령을 실행 해 본다.
+ 화면의 가로 세로를 각각 2등분하여 사각형 4개를 그린다.
+ 네 개의 사각형에 마우스를 클릭하여 색상과 크기를 바꾼다.
+ 왼쪽 마우스 클릭
+ 사각형 내부 클릭: 사각형 색상을 랜덤하게 바꾸기
+ 사각형 외부 클릭: 배경색을 랜덤하게 바꾸기
+ 오른쪽 마우스 클릭
+ 사각형 내부 클릭: 사각형 크기 축소
+ 사각형 외부 클릭: 사각형 크기 확대
+=> 사각형 하나 더 위에 만들기
+ 사각형 그리기 함수
+ void glRectf (Glfloat x1, Glfloat y1, Glfloat x2, Glfloat y2);
+ (x1, y1): 좌측 하단 좌표값
+ (x2, y2): 우측 상단 좌표값
+ 사각형 색상 바꾸기
+ void glColor3f (Glfloat r, Glfloat g, Glfloat b);
+ 현재 색상 설정하기
+ (r, g, b): red, green, blue 색상, 0.0 ~ 1.0 사이의 값으로 glRectf 를 호출하기 직전 설정한다.
+** Modern openGL 에서는 사용할 수 없는 deprecated 함수
+** 셰이더를 사용하게 되면 이 함수는 사용할 수 없음
 */
 
 GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 {
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // 바탕색을 ‘blue’ 로 지정
-	glClear(GL_COLOR_BUFFER_BIT); // 설정된 색으로 전체를 칠하기
-	for (int i = 0; i < 5; ++i) {
-		if (r<double>[i].GetAlive())
-			r<double>[i].DrawRect();
+	for (int i = 0; i < 8; ++i) {
+		r[i].DrawRect();
 	}
-
 	glutSwapBuffers(); // 화면에 출력하기
 }
 
@@ -160,42 +175,14 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 
 GLvoid Mouse(int button, int state, int x, int y)
 {
+	// 만약 내부에 있는 사각형이 먼저 충돌 됐으면 외부 사각형은 비교 X
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		left_button = true;
-	}
-	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-		left_button = false;
-	}
-}
-
-GLvoid Motion(int x, int y)
-{
-	if (left_button)
-	{
-		for (int i = 0; i < 5; ++i) {
-			if (r<double>[idx - 1].Conflict(x, y)) {
-				r<double>[idx - 1].Move(r<double>[idx - 1].ConvertPoint(x, y).GetX(), r<double>[idx - 1].ConvertPoint(x, y).GetY());
-				glutPostRedisplay();
-				break;
-			}
-			if (r<double>[i].Conflict(x, y)) {
-				r<double>[i].Move(r<double>[i].ConvertPoint(x, y).GetX(), r<double>[i].ConvertPoint(x, y).GetY());
+		for (int i = 0; i < 8; ++i) {
+			if (r[i].Conflict(x, y)) {
+				r[i].Reset();
 				glutPostRedisplay(); //--- 배경색이 바뀔 때마다 출력 콜백 함수를 호출하여 화면을 refresh 한다,
-				break;
 			}
 		}
 	}
-}
 
-GLvoid Keyboard(unsigned char key, int x, int y)
-{
-	switch (key) {
-	case 'a':
-
-		r<double>[idx].AddRect(idx);
-		glutPostRedisplay();
-		break;
-	default:
-		break;
-	}
 }
