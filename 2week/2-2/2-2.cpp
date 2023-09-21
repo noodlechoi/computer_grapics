@@ -34,18 +34,18 @@ void SetColor(Rect& r)
 	}
 }
 
+void DrawRect(const Rect& r)
+{
+	glRectf(r.p.x - size, r.p.y - size, r.p.x + size, r.p.y + size);
+	glColor3f(r.color[0], r.color[1], r.color[2]);
+}
+
 void SetPoint()
 {
 	r[0].p = { -0.5f, 0.5f };
 	r[1].p = { 0.5f, 0.5f };
 	r[2].p = { -0.5f, -0.5f };
 	r[3].p = { 0.5f, -0.5f };
-}
-
-void DrawRect(const Rect& r)
-{
-	glRectf(r.p.x - size, r.p.y - size, r.p.x + size, r.p.y + size);
-	glColor3f(r.color[0], r.color[1], r.color[2]);
 }
 
 Point ConvertPoint(const int& x, const int& y)
