@@ -146,9 +146,17 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		for (int i = 0; i < 8; ++i) {
+		for (int i = 4; i < 8; ++i) {
 			if (Conflict(r[i], x, y)) {
 				SetColor(r[i]);
+				glutPostRedisplay();
+				return;
+			}
+		}
+		for (int i = 0; i < 4; ++i) {
+			if (Conflict(r[i], x, y)) {
+				SetColor(r[i]);
+				glutPostRedisplay();
 				return;
 			}
 		}
@@ -158,6 +166,7 @@ GLvoid Mouse(int button, int state, int x, int y)
 			if (Conflict(r[i], x, y)) {
 				if(r[i].size > 0.2f)
 					r[i].size -= 0.1f;
+				glutPostRedisplay();
 				return;
 			}
 		}
@@ -165,6 +174,7 @@ GLvoid Mouse(int button, int state, int x, int y)
 			if (Conflict(r[i], x, y)) {
 				if (r[i + 4].size < 0.5f)
 					r[i + 4].size += 0.1f;
+				glutPostRedisplay();
 				return;
 			}
 		}
