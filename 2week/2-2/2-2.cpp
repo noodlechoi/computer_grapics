@@ -17,6 +17,7 @@ typedef struct Rect
 {
 	Point p;
 	float color[3];
+	float size;
 }Rect;
 
 GLvoid drawScene(GLvoid);
@@ -24,8 +25,7 @@ GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
 
 int winID;
-const float size = 0.5f;
-Rect r[4];
+Rect r[8];
 
 void SetColor(Rect& r)
 {
@@ -36,7 +36,7 @@ void SetColor(Rect& r)
 
 void DrawRect(const Rect& r)
 {
-	glRectf(r.p.x - size, r.p.y - size, r.p.x + size, r.p.y + size);
+	glRectf(r.p.x - r.size, r.p.y - r.size, r.p.x + r.size, r.p.y + r.size);
 	glColor3f(r.color[0], r.color[1], r.color[2]);
 }
 
@@ -46,6 +46,13 @@ void SetPoint()
 	r[1].p = { 0.5f, 0.5f };
 	r[2].p = { -0.5f, -0.5f };
 	r[3].p = { 0.5f, -0.5f };
+	r[4].p = { -0.5f, 0.5f };
+	r[5].p = { 0.5f, 0.5f };
+	r[6].p = { -0.5f, -0.5f };
+	r[7].p = { 0.5f, -0.5f };
+	for (int i = 0; i < 8; ++i) {
+		r[i].size = 0.5f;
+	}
 }
 
 Point ConvertPoint(const int& x, const int& y)
@@ -59,7 +66,7 @@ Point ConvertPoint(const int& x, const int& y)
 
 bool Conflict(const Rect& r, const int& x, const int& y)
 {
-	if (ConvertPoint(x, y).x <= r.p.x + size && ConvertPoint(x, y).x >= r.p.x - size && ConvertPoint(x, y).y <= r.p.y + size && ConvertPoint(x, y).y >= r.p.y - size)
+	if (ConvertPoint(x, y).x <= r.p.x + r.size && ConvertPoint(x, y).x >= r.p.x - r.size && ConvertPoint(x, y).y <= r.p.y + r.size && ConvertPoint(x, y).y >= r.p.y - r.size)
 		return true;
 	else
 		return false;
@@ -86,7 +93,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	// 랜덤 시드 설정
 	srand((unsigned int)time(NULL));
 
-	for (int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 8; ++i) {
 		SetColor(r[i]);
 	}
 	SetPoint();
@@ -122,7 +129,9 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 
 GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 {
-	for (int i = 0; i < 4; ++i) {
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // 바탕색을 ‘blue’ 로 지정
+	glClear(GL_COLOR_BUFFER_BIT); // 설정된 색으로 전체를 칠하기
+	for (int i = 0; i < 8; ++i) {
 		DrawRect(r[i]);
 	}
 
@@ -136,11 +145,27 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 
 GLvoid Mouse(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON && button == GLUT_DOWN) {
-		for (int i = 0; i < 4; ++i) {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		for (int i = 0; i < 8; ++i) {
 			if (Conflict(r[i], x, y)) {
 				SetColor(r[i]);
-				break;
+				return;
+			}
+		}
+	}
+	else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
+		for (int i = 4; i < 8; ++i) {
+			if (Conflict(r[i], x, y)) {
+				if(r[i].size > 0.2f)
+					r[i].size -= 0.1f;
+				return;
+			}
+		}
+		for (int i = 0; i < 4; ++i) {
+			if (Conflict(r[i], x, y)) {
+				if (r[i + 4].size < 0.5f)
+					r[i + 4].size += 0.1f;
+				return;
 			}
 		}
 	}
