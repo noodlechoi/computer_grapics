@@ -25,10 +25,12 @@ GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
 GLvoid Keyboard(unsigned char key, int x, int y);
+GLvoid TimerFunction(int value);
 
 int winID;
 Rect r[5];
 int now_idx;
+bool stop;
 
 void SetColor(Rect& r)
 {
@@ -171,17 +173,16 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 	case 'c':
 		break;
 	case 'o':
-		for (int i = 0; i < 5; ++i) {
-			if (r[i].is_exist)
-				SetColor(r[i]);
-		}
+		glutTimerFunc(100, TimerFunction, 1);
 		break;
 	case 's':
+		stop = true;
 		break;
 	case 'm':
 		break;
 	case 'r':
 		ResetRect();
+		stop = true;
 		break;
 	case 'q':
 		glutDestroyWindow(winID);
@@ -190,4 +191,26 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 	}
 
 	glutPostRedisplay(); //--- 배경색이 바뀔 때마다 출력 콜백 함수를 호출하여 화면을 refresh 한다, 호출 시 drawScene로 이동한다!
+}
+
+
+GLvoid TimerFunction(int value)
+{
+	if (stop) {
+		// 멈췄으니 다음 명령어에 작동되도록
+		stop = false;
+		return;
+	}
+
+	// 색깔 변화
+	if (value == 1) {
+		for (int i = 0; i < 5; ++i) {
+			if (r[i].is_exist)
+				SetColor(r[i]);
+		}
+	}
+
+	glutPostRedisplay();
+	if (value == 1)
+		glutTimerFunc(100, TimerFunction, 1);
 }
