@@ -103,7 +103,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 {
 	glClearColor(0.1f, 0.1f, 0.1, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT); // 설정된 색으로 전체를 칠하기
-	
+
 
 	glutSwapBuffers(); // 화면에 출력하기
 }
@@ -116,6 +116,6 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		
+
 	}
 }
