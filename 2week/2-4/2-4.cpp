@@ -17,7 +17,8 @@ typedef struct Rect
 {
 	Point p;
 	float color[3];
-	float size;
+	float size_x;
+	float size_y;
 	bool is_exist;
 }Rect;
 
@@ -30,7 +31,7 @@ GLvoid TimerFunction(int value);
 int winID;
 Rect r[5];
 int now_idx;
-bool stop;
+bool stop, start_color, start_size;
 
 void SetColor(Rect& r)
 {
@@ -42,7 +43,7 @@ void SetColor(Rect& r)
 void DrawRect(const Rect& r)
 {
 	glColor3f(r.color[0], r.color[1], r.color[2]);
-	glRectf(r.p.x - r.size, r.p.y - r.size, r.p.x + r.size, r.p.y + r.size);
+	glRectf(r.p.x - r.size_x, r.p.y - r.size_y, r.p.x + r.size_x, r.p.y + r.size_y);
 }
 
 Point ConvertPoint(const int& x, const int& y)
@@ -56,7 +57,7 @@ Point ConvertPoint(const int& x, const int& y)
 
 bool Conflict(const Rect& r, const int& x, const int& y)
 {
-	if (ConvertPoint(x, y).x <= r.p.x + r.size && ConvertPoint(x, y).x >= r.p.x - r.size && ConvertPoint(x, y).y <= r.p.y + r.size && ConvertPoint(x, y).y >= r.p.y - r.size)
+	if (ConvertPoint(x, y).x <= r.p.x + r.size_x && ConvertPoint(x, y).x >= r.p.x - r.size_x && ConvertPoint(x, y).y <= r.p.y + r.size_y && ConvertPoint(x, y).y >= r.p.y - r.size_y)
 		return true;
 	else
 		return false;
@@ -71,7 +72,8 @@ void ProduceRect(const int& x, const int& y)
 		// 사각형 초기화
 		r[now_idx].p = p;
 		SetColor(r[now_idx]);
-		r[now_idx].size = 0.1;
+		r[now_idx].size_x = 0.1;
+		r[now_idx].size_y = 0.1;
 		r[now_idx].is_exist = true;
 	}
 	// 좌표만 변환
@@ -80,6 +82,8 @@ void ProduceRect(const int& x, const int& y)
 		Point p = ConvertPoint(x, y);
 		// 사각형 초기화
 		r[now_idx % 5].p = p;
+		r[now_idx].size_x = 0.1;
+		r[now_idx].size_y = 0.1;
 		SetColor(r[now_idx % 5]);
 	}
 	now_idx++;
@@ -91,6 +95,29 @@ void ResetRect()
 	for (int i = 0; i < 5; ++i)
 		r[i].is_exist = false;
 	now_idx = 0;
+}
+
+// 사각형 사이즈 증가
+void AnimationSize(Rect& r)
+{
+	static int cnt = 0;
+	
+	if (cnt < 20) {
+		r.size_x += 0.01f;
+	}
+	else if (cnt < 40) {
+		r.size_x -= 0.01f;
+	}
+	else if(cnt < 60){
+		r.size_y += 0.01f;
+	}
+	else if (cnt < 80) {
+		r.size_y -= 0.01f;
+	}
+	else {
+		cnt = 0;
+	}
+	cnt++;
 }
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -171,18 +198,35 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 	case 'i':
 		break;
 	case 'c':
+		stop = false;
+		if (!start_size) {
+			glutTimerFunc(100, TimerFunction, 2);
+			start_size = true;
+		}
+		else
+			start_size = false;
 		break;
 	case 'o':
-		glutTimerFunc(100, TimerFunction, 1);
+		stop = false;
+		if (!start_color) {
+			glutTimerFunc(100, TimerFunction, 1);
+			start_color = true;
+		}
+		else
+			start_color = false;
 		break;
 	case 's':
 		stop = true;
+		start_color = false;
+		start_size = false;
 		break;
 	case 'm':
 		break;
 	case 'r':
 		ResetRect();
 		stop = true;
+		start_color = false;
+		start_size = false;
 		break;
 	case 'q':
 		glutDestroyWindow(winID);
@@ -196,11 +240,7 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 
 GLvoid TimerFunction(int value)
 {
-	if (stop) {
-		// 멈췄으니 다음 명령어에 작동되도록
-		stop = false;
-		return;
-	}
+	if (stop) return;
 
 	// 색깔 변화
 	if (value == 1) {
@@ -209,8 +249,19 @@ GLvoid TimerFunction(int value)
 				SetColor(r[i]);
 		}
 	}
+	// 모양 변화
+	else if (value == 2) {
+		for (int i = 0; i < 5; ++i) {
+			if (r[i].is_exist)
+				AnimationSize(r[i]);
+		}
+	}
 
 	glutPostRedisplay();
-	if (value == 1)
+
+	// 재귀적 호출
+	if (value == 1 && start_color)
 		glutTimerFunc(100, TimerFunction, 1);
+	else if (value == 2 && start_size)
+		glutTimerFunc(100, TimerFunction, 2);
 }
