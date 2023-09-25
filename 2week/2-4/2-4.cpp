@@ -120,6 +120,31 @@ void AnimationSize(Rect& r)
 	cnt++;
 }
 
+void AnimationZigZag(Rect& r)
+{
+	static int cnt = 0;
+
+	// x 이동
+	r.p.x += 0.01f;
+	// 화면 너머로 가면 맨 왼쪽으로
+	if (r.p.x >= ConvertPoint(WIDTH, 0).x) {
+		r.p.x = ConvertPoint(0, 0).x;
+	}
+
+	// y 이동
+	if (cnt < 20) {
+		r.p.y += 0.02f;
+	}
+	else {
+		r.p.y -= 0.02f;
+	}
+	if (cnt >= 40) {
+		cnt = 0;
+	}
+
+	cnt++;
+}
+
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 { //--- 윈도우 생성하기
 	glutInit(&argc, argv); // glut 초기화
@@ -196,6 +221,7 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 	case 'a':
 		break;
 	case 'i':
+		glutTimerFunc(100, TimerFunction, 3);
 		break;
 	case 'c':
 		stop = false;
@@ -256,6 +282,13 @@ GLvoid TimerFunction(int value)
 				AnimationSize(r[i]);
 		}
 	}
+	// 지그재그
+	else if (value == 3) {
+		for (int i = 0; i < 5; ++i) {
+			if (r[i].is_exist)
+				AnimationZigZag(r[i]);
+		}
+	}
 
 	glutPostRedisplay();
 
@@ -264,4 +297,6 @@ GLvoid TimerFunction(int value)
 		glutTimerFunc(100, TimerFunction, 1);
 	else if (value == 2 && start_size)
 		glutTimerFunc(100, TimerFunction, 2);
+	else if (value == 3)
+		glutTimerFunc(100, TimerFunction, 3);
 }
