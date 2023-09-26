@@ -13,6 +13,11 @@ typedef struct Point
 	float x, y;
 }Point;
 
+typedef struct Dir
+{
+	int x, y;
+}Dir;
+
 typedef struct Rect
 {
 	Point p;
@@ -20,6 +25,7 @@ typedef struct Rect
 	float size_x;
 	float size_y;
 	bool is_exist;
+	Dir dir;
 }Rect;
 
 GLvoid drawScene(GLvoid);
@@ -31,7 +37,7 @@ GLvoid TimerFunction(int value);
 int winID;
 Rect r[5];
 int now_idx;
-bool stop, start_color, start_size;
+bool stop, start_color, start_size, start_zigzag, start_cross;
 
 void SetColor(Rect& r)
 {
@@ -138,6 +144,21 @@ void AnimationZigZag(Rect& r, int& cnt)
 	}
 }
 
+void SetDirect(Rect& r)
+{
+	// 방향이 없으면 계속 반복
+	while (r.dir.x == 0 || r.dir.y == 0) {
+		r.dir.x = rand() % 3 - 1;
+		r.dir.y = rand() % 3 - 1;
+	}
+}
+
+void AnimationCross(Rect& r)
+{
+	r.p.x += 0.02f * r.dir.x;
+	r.p.y += 0.02f * r.dir.y;
+}
+
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 { //--- 윈도우 생성하기
 	glutInit(&argc, argv); // glut 초기화
@@ -212,15 +233,31 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case 'a':
+		stop = false;
+		if (!start_cross) {
+			start_cross = true;
+			for (int i = 0; i < 5; ++i) {
+				SetDirect(r[i]);
+			}
+			glutTimerFunc(100, TimerFunction, 4);
+		}
+		else
+			start_cross = false;
 		break;
 	case 'i':
-		glutTimerFunc(100, TimerFunction, 3);
+		stop = false;
+		if (!start_zigzag) {
+			start_zigzag = true;
+			glutTimerFunc(100, TimerFunction, 3);
+		}
+		else
+			start_zigzag = false;
 		break;
 	case 'c':
 		stop = false;
 		if (!start_size) {
-			glutTimerFunc(100, TimerFunction, 2);
 			start_size = true;
+			glutTimerFunc(100, TimerFunction, 2);
 		}
 		else
 			start_size = false;
@@ -228,8 +265,8 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 	case 'o':
 		stop = false;
 		if (!start_color) {
-			glutTimerFunc(100, TimerFunction, 1);
 			start_color = true;
+			glutTimerFunc(100, TimerFunction, 1);
 		}
 		else
 			start_color = false;
@@ -238,6 +275,8 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 		stop = true;
 		start_color = false;
 		start_size = false;
+		start_zigzag = false;
+		start_cross = false;
 		break;
 	case 'm':
 		break;
@@ -246,6 +285,8 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 		stop = true;
 		start_color = false;
 		start_size = false;
+		start_zigzag = false;
+		start_cross = false;
 		break;
 	case 'q':
 		glutDestroyWindow(winID);
@@ -286,6 +327,13 @@ GLvoid TimerFunction(int value)
 		}
 		cnt_zigzag++;
 	}
+	// 대각선
+	else if (value == 4) {
+		for (int i = 0; i < 5; ++i) {
+			if (r[i].is_exist)
+				AnimationCross(r[i]);
+		}
+	}
 
 	glutPostRedisplay();
 
@@ -294,6 +342,8 @@ GLvoid TimerFunction(int value)
 		glutTimerFunc(100, TimerFunction, 1);
 	else if (value == 2 && start_size)
 		glutTimerFunc(100, TimerFunction, 2);
-	else if (value == 3)
+	else if (value == 3 && start_zigzag)
 		glutTimerFunc(100, TimerFunction, 3);
+	else if (value == 4 && start_cross)
+		glutTimerFunc(100, TimerFunction, 4);
 }
