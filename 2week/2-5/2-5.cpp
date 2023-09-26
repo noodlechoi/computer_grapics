@@ -124,7 +124,9 @@ void InitRect(Rect& r)
 {
 	r.size_x = 0.1f;
 	r.size_y = 0.1f;
-	SetColor(r);
+	// 검정색으로 초기화
+	for (int i = 0; i < 3; ++i)
+		m_r.color[i] = 0.0f;
 }
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -208,6 +210,7 @@ GLvoid Mouse(int button, int state, int x, int y)
 	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		left_button = false;
 		m_r.is_exist = false;
+		InitRect(m_r);
 	}
 
 }
