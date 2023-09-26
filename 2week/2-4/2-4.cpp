@@ -36,6 +36,7 @@ GLvoid TimerFunction(int value);
 
 int winID;
 Rect r[5];
+Point save_p[5];
 int now_idx;
 bool stop, start_color, start_size, start_zigzag, start_cross;
 
@@ -72,26 +73,19 @@ bool Conflict(const Rect& r, const int& x, const int& y)
 // 마우스 클릭 시 사각형 생성
 void ProduceRect(const int& x, const int& y)
 {
-	if (now_idx < 5) {
-		// 좌표계 변환
-		Point p = ConvertPoint(x, y);
-		// 사각형 초기화
-		r[now_idx].p = p;
-		SetColor(r[now_idx]);
-		r[now_idx].size_x = 0.1;
-		r[now_idx].size_y = 0.1;
-		r[now_idx].is_exist = true;
-	}
-	// 좌표만 변환
-	else {
-		// 좌표계 변환
-		Point p = ConvertPoint(x, y);
-		// 사각형 초기화
-		r[now_idx % 5].p = p;
-		r[now_idx].size_x = 0.1;
-		r[now_idx].size_y = 0.1;
-		SetColor(r[now_idx % 5]);
-	}
+	// 좌표계 변환
+	Point p = ConvertPoint(x, y);
+
+	// 사각형 초기화
+	r[now_idx % 5].p = p;
+	r[now_idx % 5].size_x = 0.1;
+	r[now_idx % 5].size_y = 0.1;
+	SetColor(r[now_idx % 5]);
+	r[now_idx % 5].is_exist = true;
+
+	// 좌표 저장
+	save_p[now_idx % 5] = p;
+
 	now_idx++;
 }
 
@@ -157,6 +151,13 @@ void AnimationCross(Rect& r)
 {
 	r.p.x += 0.02f * r.dir.x;
 	r.p.y += 0.02f * r.dir.y;
+
+	if (r.p.x - r.size_x <= -1.0f || r.p.x + r.size_x >= 1.0f) {
+		r.dir.x *= -1;
+	}
+	else if (r.p.y - r.size_y <= -1.0f || r.p.y + r.size_y >= 1.0f) {
+		r.dir.y *= -1;
+	}
 }
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -279,6 +280,14 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 		start_cross = false;
 		break;
 	case 'm':
+		stop = true;
+		start_color = false;
+		start_size = false;
+		start_zigzag = false;
+		start_cross = false;
+		for (int i = 0; i < 5; ++i) {
+			r[i].p = save_p[i];
+		}
 		break;
 	case 'r':
 		ResetRect();
