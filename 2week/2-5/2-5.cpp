@@ -33,8 +33,10 @@ GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
 GLvoid Keyboard(unsigned char key, int x, int y);
 
+const int rect_cnt = 30;
+
 int winID;
-Rect r[5];
+Rect r[rect_cnt];
 int now_idx;
 
 void SetColor(Rect& r)
@@ -74,11 +76,11 @@ void ProduceRect(const int& x, const int& y)
 	Point p = ConvertPoint(x, y);
 
 	// 사각형 초기화
-	r[now_idx % 5].p = p;
-	r[now_idx % 5].size_x = 0.1;
-	r[now_idx % 5].size_y = 0.1;
-	SetColor(r[now_idx % 5]);
-	r[now_idx % 5].is_exist = true;
+	r[now_idx % rect_cnt].p = p;
+	r[now_idx % rect_cnt].size_x = 0.05;
+	r[now_idx % rect_cnt].size_y = 0.05;
+	SetColor(r[now_idx % rect_cnt]);
+	r[now_idx % rect_cnt].is_exist = true;
 
 	now_idx++;
 }
@@ -86,7 +88,7 @@ void ProduceRect(const int& x, const int& y)
 // 사각형 초기화
 void ResetRect()
 {
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < rect_cnt; ++i)
 		r[i].is_exist = false;
 	now_idx = 0;
 }
@@ -112,6 +114,12 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	// 랜덤 시드 설정
 	srand((unsigned int)time(NULL));
 
+	// 사각형 생성
+	for (int i = 0; i < rect_cnt; ++i) {
+		int x = rand() % WIDTH, y = rand() % HEIGHT;
+		ProduceRect(x, y);
+	}
+
 	glutDisplayFunc(drawScene); // 출력 함수의 지정
 	glutReshapeFunc(Reshape); // 다시 그리기 함수 지정
 	glutMouseFunc(Mouse);
@@ -136,7 +144,7 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 	glClearColor(0.1f, 0.1f, 0.1, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT); // 설정된 색으로 전체를 칠하기
 
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < rect_cnt; ++i) {
 		if (r[i].is_exist)
 			DrawRect(r[i]);
 	}
@@ -152,7 +160,6 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		ProduceRect(x, y);
 	}
 }
 
