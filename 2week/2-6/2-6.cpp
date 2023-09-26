@@ -42,7 +42,7 @@ Rect r[rect_cnt];
 Rect r_d[disappear];
 int now_idx;
 int dis_idx;
-bool start_cross, start_updown;
+bool start_cross, start_updown, start_all;
 
 void SetColor(Rect& r)
 {
@@ -164,7 +164,41 @@ void UpDownReplaceDisRect(int i, int j)
 
 void AllReplaceDisRect(int i, int j)
 {
-
+	int idx = dis_idx % disappear - 1;
+	// size
+	float _x = r[i].size_x / 2, _y = r[i].size_y / 4;
+	if (j == 0) {
+		r_d[idx].p = { r[i].p.x - _x,  r[i].p.y + _y * 3 };
+		r_d[idx].dir = { -1, 1 };
+	}
+	else if (j == 1) {
+		r_d[idx].p = { r[i].p.x - _x,  r[i].p.y + _y };
+		r_d[idx].dir = { -1, 0 };
+	}
+	else if (j == 2) {
+		r_d[idx].p = { r[i].p.x - _x,  r[i].p.y - _y };
+		r_d[idx].dir = { 0, -1 };
+	}
+	else if (j == 3) {
+		r_d[idx].p = { r[i].p.x - _x,  r[i].p.y - _y * 3 };
+		r_d[idx].dir = { -1, -1 };
+	}
+	else if (j == 4) {
+		r_d[idx].p = { r[i].p.x + _x,  r[i].p.y + _y  * 3};
+		r_d[idx].dir = { 1, 1 };
+	}
+	else if (j == 5) {
+		r_d[idx].p = { r[i].p.x + _x,  r[i].p.y + _y };
+		r_d[idx].dir = { 0, 1 };
+	}
+	else if (j == 6) {
+		r_d[idx].p = { r[i].p.x + _x,  r[i].p.y - _y };
+		r_d[idx].dir = { 1, 0 };
+	}
+	else if (j == 7) {
+		r_d[idx].p = { r[i].p.x + _x,  r[i].p.y - _y * 3 };
+		r_d[idx].dir = { 1, -1 };
+	}
 }
 
 void MoveRect(Rect& r)
@@ -256,7 +290,7 @@ GLvoid Mouse(int button, int state, int x, int y)
 					r[i].is_exist = false;
 
 					// 랜덤적으로
-					int rand_num = 1;
+					int rand_num = 2;
 					// 대각선
 					if (rand_num == 0) {
 						// 나누기, 타이머 함수
@@ -282,7 +316,14 @@ GLvoid Mouse(int button, int state, int x, int y)
 					}
 					// 좌우상하대각선
 					else if (rand_num == 2) {
-						ResetDisRect(r[i], 8);
+						for (int j = 0; j < 8; ++j) {
+							ResetDisRect(r[i], 4);
+							AllReplaceDisRect(i, j);
+							if (!start_all) {
+								start_all = true;
+								glutTimerFunc(100, TimerFunction, 3);
+							}
+						}
 					}
 				}
 			}
@@ -314,6 +355,12 @@ GLvoid TimerFunction(int value)
 			MoveRect(r_d[i]);
 		}
 		glutTimerFunc(100, TimerFunction, 2);
+	}
+	else if (value == 3) {
+		for (int i = 0; i < disappear; ++i) {
+			MoveRect(r_d[i]);
+		}
+		glutTimerFunc(100, TimerFunction, 3);
 	}
 
 	glutPostRedisplay();
