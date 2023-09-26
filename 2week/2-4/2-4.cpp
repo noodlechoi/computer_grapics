@@ -98,32 +98,27 @@ void ResetRect()
 }
 
 // 사각형 사이즈 증가
-void AnimationSize(Rect& r)
+void AnimationSize(Rect& r, int& cnt)
 {
-	static int cnt = 0;
-	
-	if (cnt < 20) {
+	if (cnt < 10) {
 		r.size_x += 0.01f;
 	}
-	else if (cnt < 40) {
+	else if (cnt < 20) {
 		r.size_x -= 0.01f;
 	}
-	else if(cnt < 60){
+	else if(cnt < 30){
 		r.size_y += 0.01f;
 	}
-	else if (cnt < 80) {
+	else if (cnt < 40) {
 		r.size_y -= 0.01f;
 	}
 	else {
 		cnt = 0;
 	}
-	cnt++;
 }
 
-void AnimationZigZag(Rect& r)
+void AnimationZigZag(Rect& r, int& cnt)
 {
-	static int cnt = 0;
-
 	// x 이동
 	r.p.x += 0.01f;
 	// 화면 너머로 가면 맨 왼쪽으로
@@ -132,17 +127,15 @@ void AnimationZigZag(Rect& r)
 	}
 
 	// y 이동
-	if (cnt < 20) {
+	if (cnt < 10) {
 		r.p.y += 0.02f;
 	}
 	else {
 		r.p.y -= 0.02f;
 	}
-	if (cnt >= 40) {
+	if (cnt >= 20) {
 		cnt = 0;
 	}
-
-	cnt++;
 }
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -277,17 +270,21 @@ GLvoid TimerFunction(int value)
 	}
 	// 모양 변화
 	else if (value == 2) {
+		static int cnt_size = 0;
 		for (int i = 0; i < 5; ++i) {
 			if (r[i].is_exist)
-				AnimationSize(r[i]);
+				AnimationSize(r[i], cnt_size);
 		}
+		cnt_size++;
 	}
 	// 지그재그
 	else if (value == 3) {
+		static int cnt_zigzag = 0;
 		for (int i = 0; i < 5; ++i) {
 			if (r[i].is_exist)
-				AnimationZigZag(r[i]);
+				AnimationZigZag(r[i], cnt_zigzag);
 		}
+		cnt_zigzag++;
 	}
 
 	glutPostRedisplay();
