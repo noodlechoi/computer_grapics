@@ -42,6 +42,7 @@ Rect r[rect_cnt];
 Rect r_d[disappear];
 int now_idx;
 int dis_idx;
+bool start_cross;
 
 void SetColor(Rect& r)
 {
@@ -140,10 +141,16 @@ void ReplaceDisRect(int i, int j)
 	}
 }
 
-// 상하좌우
-void ForMove(Rect& r)
+void MoveRect(Rect& r)
 {
-	
+	r.p.x += 0.02f * r.dir.x;
+	r.p.y += 0.02f * r.dir.y;
+	r.size_x -= 0.005f;
+	r.size_y -= 0.005f;
+
+	if (r.size_x <= 0.0f || r.size_y <= 0.0f) {
+		r.is_exist = false;
+	}
 }
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -224,15 +231,19 @@ GLvoid Mouse(int button, int state, int x, int y)
 
 					// 랜덤적으로
 					int rand_num = 0;
-					// 좌우상하 이동
+					// 대각선
 					if (rand_num == 0) {
+						// 나누기, 타이머 함수
 						for (int j = 0; j < 4; ++j) {
 							ResetDisRect(r[i], 4);
 							ReplaceDisRect(i, j);
-							glutTimerFunc(100, TimerFunction, 1);
+							if (!start_cross) {
+								start_cross = true;
+								glutTimerFunc(100, TimerFunction, 1);
+							}
 						}
 					}
-					// 대각선
+					// 좌우상하 이동
 					else if (rand_num == 1) {
 						for (int j = 0; j < 4; ++j) {
 							ResetDisRect(r[i], 4);
@@ -263,6 +274,11 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 GLvoid TimerFunction(int value)
 {
 	if (value == 1) {
-
+		for (int i = 0; i < disappear; ++i) {
+			MoveRect(r_d[i]);
+		}
+		glutTimerFunc(100, TimerFunction, 1);
 	}
+
+	glutPostRedisplay();
 }
