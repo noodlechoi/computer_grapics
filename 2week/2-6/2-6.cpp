@@ -122,7 +122,7 @@ void ResetDisRect(const Rect& r, int cnt)
 // 상하좌우
 void ForMove(Rect& r)
 {
-
+	
 }
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -202,10 +202,20 @@ GLvoid Mouse(int button, int state, int x, int y)
 					r[i].is_exist = false;
 
 					// 랜덤적으로
-					int rand_num = rand() % 3;
+					int rand_num = 0;
 					// 좌우상하 이동
 					if (rand_num == 0) {
-						ResetDisRect(r[i], 4);
+						for (int j = 0; j < 4; ++j) {
+							ResetDisRect(r[i], 4);
+							if(j == 0)
+								r_d[dis_idx % disappear - 1].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+							else if (j == 1)
+								r_d[dis_idx % disappear - 1].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
+							else if (j == 2)
+								r_d[dis_idx % disappear - 1].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
+							else if (j == 3)
+								r_d[dis_idx % disappear - 1].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+						}
 					}
 					// 대각선
 					else if (rand_num == 1) {
