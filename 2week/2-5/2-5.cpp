@@ -227,8 +227,9 @@ GLvoid Motion(int x, int y)
 				if (RectConflict(m_r, r[i])) {
 					// 지우기
 					r[i].is_exist = false;
+					// 색깔 더하기, 계속 더하면 검정색이 되므로 나머지 연산 사용
 					for (int j = 0; j < 3; ++j) {
-						m_r.color[j] += r[i].color[j];
+						m_r.color[j] = fmod((m_r.color[j] + r[i].color[j]), 0.9f);
 					}
 					// 사이즈 증가
 					m_r.size_x += 0.01f;
