@@ -119,16 +119,25 @@ void ResetDisRect(const Rect& r, int cnt)
 }
 
 // 분해
-void ReplaceDisRect(Point& p, int i, int j)
+void ReplaceDisRect(int i, int j)
 {
-	if (j == 0)
-		r_d[dis_idx % disappear - 1].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
-	else if (j == 1)
-		r_d[dis_idx % disappear - 1].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
-	else if (j == 2)
-		r_d[dis_idx % disappear - 1].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
-	else if (j == 3)
-		r_d[dis_idx % disappear - 1].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+	int idx = dis_idx % disappear - 1;
+	if (j == 0) {
+		r_d[idx].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+		r_d[idx].dir = { -1, -1 };
+	}
+	else if (j == 1) {
+		r_d[idx].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
+		r_d[idx].dir = { 1, 1 };
+	}
+	else if (j == 2) {
+		r_d[idx].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
+		r_d[idx].dir = { -1, 1 };
+	}
+	else if (j == 3) {
+		r_d[idx].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+		r_d[idx].dir = { 1, -1 };
+	}
 }
 
 // 상하좌우
@@ -219,13 +228,16 @@ GLvoid Mouse(int button, int state, int x, int y)
 					if (rand_num == 0) {
 						for (int j = 0; j < 4; ++j) {
 							ResetDisRect(r[i], 4);
-							ReplaceDisRect(r_d[dis_idx % disappear - 1].p, i, j);
-							
+							ReplaceDisRect(i, j);
+							glutTimerFunc(100, TimerFunction, 1);
 						}
 					}
 					// 대각선
 					else if (rand_num == 1) {
-						ResetDisRect(r[i], 4);
+						for (int j = 0; j < 4; ++j) {
+							ResetDisRect(r[i], 4);
+							ReplaceDisRect(i, j);
+						}
 					}
 					// 좌우상하대각선
 					else if (rand_num == 2) {
@@ -250,5 +262,7 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 
 GLvoid TimerFunction(int value)
 {
+	if (value == 1) {
 
+	}
 }
