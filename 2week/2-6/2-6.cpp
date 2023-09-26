@@ -348,19 +348,22 @@ GLvoid TimerFunction(int value)
 		for (int i = 0; i < disappear; ++i) {
 			MoveRect(r_d[i]);
 		}
-		glutTimerFunc(100, TimerFunction, 1);
+		if(start_cross)
+			glutTimerFunc(100, TimerFunction, 1);
 	}
 	else if (value == 2) {
 		for (int i = 0; i < disappear; ++i) {
 			MoveRect(r_d[i]);
 		}
-		glutTimerFunc(100, TimerFunction, 2);
+		if (start_updown)
+			glutTimerFunc(100, TimerFunction, 2);
 	}
 	else if (value == 3) {
 		for (int i = 0; i < disappear; ++i) {
 			MoveRect(r_d[i]);
 		}
-		glutTimerFunc(100, TimerFunction, 3);
+		if (start_all)
+			glutTimerFunc(100, TimerFunction, 3);
 	}
 
 	glutPostRedisplay();
