@@ -75,10 +75,9 @@ bool Conflict(const Rect& r, const int& x, const int& y)
 // 사각형끼리 충돌 체크
 bool RectConflict(const Rect& r1, const Rect& r2)
 {
-	// r1, r2 두 변의 길이가 (size1+ size2) * 2 이하이면 충돌
-	// 두 변의 길이
-	float x = (r1.p.x - r1.size_x) - (r2.p.x + r2.size_x);
-	float y = (r1.p.y - r1.size_y) - (r2.p.y + r2.size_y);
+	// 두 좌표 사이의 거리가 두 변 합의 길이보다 작으면 true
+	float x = (r1.p.x) - (r2.p.x);
+	float y = (r1.p.y) - (r2.p.y);
 	x = x < 0 ? x * -1 : x;
 	y = y < 0 ? y * -1 : y;
 
