@@ -32,11 +32,14 @@ GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
 GLvoid Keyboard(unsigned char key, int x, int y);
+GLvoid TimerFunction(int value);
 
-const int rect_cnt = 30;
+const int rect_cnt = 5;
+const int disappear = rect_cnt * 8;
 
 int winID;
 Rect r[rect_cnt];
+Rect r_d[disappear];
 int now_idx;
 
 void SetColor(Rect& r)
@@ -84,8 +87,8 @@ void ProduceRect(const int& x, const int& y)
 
 	// 사각형 초기화
 	r[now_idx % rect_cnt].p = p;
-	r[now_idx % rect_cnt].size_x = 0.05;
-	r[now_idx % rect_cnt].size_y = 0.05;
+	r[now_idx % rect_cnt].size_x = 0.1;
+	r[now_idx % rect_cnt].size_y = 0.1;
 	SetColor(r[now_idx % rect_cnt]);
 	r[now_idx % rect_cnt].is_exist = true;
 
@@ -98,6 +101,26 @@ void ResetRect()
 	for (int i = 0; i < rect_cnt; ++i)
 		r[i].is_exist = true;
 	now_idx = 0;
+}
+
+// 사라지는 사각형 초기화
+void ResetDisRect(const Rect& r, int cnt)
+{
+	for (int i = 0; i < disappear; ++i) {
+		r_d[i].p = r.p;
+		r_d[i].is_exist = true;
+		r_d[i].size_x = r.size_x / cnt;
+		r_d[i].size_y = r.size_y / cnt;
+
+		for (int j = 0; j < 3; ++j)
+			r_d[i].color[j] = r.color[j];
+	}
+}
+
+// 상하좌우
+void ForMove(Rect& r)
+{
+
 }
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
@@ -121,6 +144,11 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	// 랜덤 시드 설정
 	srand((unsigned int)time(NULL));
 
+	for (int i = 0; i < 5; ++i) {
+		int x = rand() % WIDTH, y = rand() % HEIGHT;
+		ProduceRect(x, y);
+	}
+
 	glutDisplayFunc(drawScene); // 출력 함수의 지정
 	glutReshapeFunc(Reshape); // 다시 그리기 함수 지정
 	glutMouseFunc(Mouse);
@@ -129,15 +157,15 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 }
 
 /*
-화면 지우기
- 윈도우를 띄우고 화면에 같은 크기의 작은 사각형을 다양한 색으로 임의의 위치에 20~40개 그린다.
- 왼쪽 마우 스 버튼을 누르면 화면의 사각형의 2배의 크기의 사각형(지우개 사각형)이 그려지고, 마우스를 누른
-채로 이동시키면 지우개 사각형이 위치를 이동한다.
- 지우개 사각형과 부딪친 배경 사각형은 사라진다. 배경 사각형이 사라지면 지우개 사각형의 크기가 커지고 (기
-존의 지우개 색상 + 부딪친 사각형 색상)으로 색상을 변경한다..
- 왼쪽 마우스 버튼을 떼면 지우개 사각형은 사라진다.
- 다시 마우스를 누르면 검정색의 기존의 지우개 사각형 크기로 지우개 사각형이 생긴다.
- 키보드 명령어 r: 기존 사각형 삭제되고 새로 그리기
+퍼져 나가는 사각형 애니메이션
+ 화면의 랜덤한 위치에 5개의 사각형을 랜덤한 색상으로 그린다.
+ 마우스로 사각형 내부를 클릭하면, 사각형은 사등분되어
+ 위치를 이동한다.
+ 이 때, 사각형은 크기가 점점 작아지며 특정 크기가 되면 사라진다.
+ 위치 이동 애니메이션
+① 좌우상하 이동
+② 대각선 이동
+③ 좌우상하대각선 이동 (이때는 축소된 사각형이 8개 나타난다).
 */
 
 GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
@@ -148,6 +176,10 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 	for (int i = 0; i < rect_cnt; ++i) {
 		if (r[i].is_exist)
 			DrawRect(r[i]);
+	}
+	for (int i = 0; i < disappear; ++i) {
+		if (r_d[i].is_exist)
+			DrawRect(r_d[i]);
 	}
 
 	glutSwapBuffers(); // 화면에 출력하기
@@ -161,8 +193,29 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-	}
-	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		for (int i = 0; i < 5; ++i) {
+			if (r[i].is_exist) {
+				if (Conflict(r[i], x, y)) {
+					// 사각형 사라지게
+					r[i].is_exist = false;
+
+					// 랜덤적으로
+					int rand_num = rand() % 3;
+					// 좌우상하 이동
+					if (rand_num == 0) {
+						ResetDisRect(r[i], 4);
+					}
+					// 대각선
+					else if (rand_num == 1) {
+						ResetDisRect(r[i], 4);
+					}
+					// 좌우상하대각선
+					else if (rand_num == 2) {
+						ResetDisRect(r[i], 8);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -174,4 +227,9 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 		std::cout << "프로그램 종료" << std::endl;
 		break;
 	}
+}
+
+GLvoid TimerFunction(int value)
+{
+
 }
