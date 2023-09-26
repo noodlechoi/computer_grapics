@@ -37,10 +37,12 @@ GLvoid TimerFunction(int value);
 const int rect_cnt = 5;
 const int disappear = rect_cnt * 8;
 
+
 int winID;
 Rect r[rect_cnt];
 Rect r_d[disappear];
 int now_idx;
+int dis_idx;
 
 void SetColor(Rect& r)
 {
@@ -106,15 +108,15 @@ void ResetRect()
 // 사라지는 사각형 초기화
 void ResetDisRect(const Rect& r, int cnt)
 {
-	for (int i = 0; i < disappear; ++i) {
-		r_d[i].p = r.p;
-		r_d[i].is_exist = true;
-		r_d[i].size_x = r.size_x / cnt;
-		r_d[i].size_y = r.size_y / cnt;
+	r_d[dis_idx % disappear].p = r.p;
+	r_d[dis_idx % disappear].is_exist = true;
+	r_d[dis_idx % disappear].size_x = r.size_x * (cnt * 0.1);
+	r_d[dis_idx % disappear].size_y = r.size_y * (cnt * 0.1);
 
-		for (int j = 0; j < 3; ++j)
-			r_d[i].color[j] = r.color[j];
-	}
+	for (int j = 0; j < 3; ++j)
+		r_d[dis_idx % disappear].color[j] = r.color[j];
+
+	dis_idx++;
 }
 
 // 상하좌우
@@ -216,6 +218,7 @@ GLvoid Mouse(int button, int state, int x, int y)
 				}
 			}
 		}
+		glutPostRedisplay();
 	}
 }
 
