@@ -228,6 +228,9 @@ GLvoid Motion(int x, int y)
 					for (int j = 0; j < 3; ++j) {
 						m_r.color[j] = fmod((m_r.color[j] + r[i].color[j]), 0.9f);
 					}
+					// 사이즈 증가
+					m_r.size_x += 0.01f;
+					m_r.size_y += 0.01f;
 				}
 			}
 		}
