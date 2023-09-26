@@ -42,7 +42,7 @@ Rect r[rect_cnt];
 Rect r_d[disappear];
 int now_idx;
 int dis_idx;
-bool start_cross;
+bool start_cross, start_updown;
 
 void SetColor(Rect& r)
 {
@@ -120,7 +120,7 @@ void ResetDisRect(const Rect& r, int cnt)
 }
 
 // 분해
-void ReplaceDisRect(int i, int j)
+void CrossReplaceDisRect(int i, int j)
 {
 	int idx = dis_idx % disappear - 1;
 	if (j == 0) {
@@ -139,6 +139,32 @@ void ReplaceDisRect(int i, int j)
 		r_d[idx].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
 		r_d[idx].dir = { 1, -1 };
 	}
+}
+
+void UpDownReplaceDisRect(int i, int j)
+{
+	int idx = dis_idx % disappear - 1;
+	if (j == 0) {
+		r_d[idx].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+		r_d[idx].dir = { 0, -1 };
+	}
+	else if (j == 1) {
+		r_d[idx].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
+		r_d[idx].dir = { 0, 1 };
+	}
+	else if (j == 2) {
+		r_d[idx].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
+		r_d[idx].dir = { -1, 0 };
+	}
+	else if (j == 3) {
+		r_d[idx].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+		r_d[idx].dir = { 1, 0 };
+	}
+}
+
+void AllReplaceDisRect(int i, int j)
+{
+
 }
 
 void MoveRect(Rect& r)
@@ -230,13 +256,13 @@ GLvoid Mouse(int button, int state, int x, int y)
 					r[i].is_exist = false;
 
 					// 랜덤적으로
-					int rand_num = 0;
+					int rand_num = 1;
 					// 대각선
 					if (rand_num == 0) {
 						// 나누기, 타이머 함수
 						for (int j = 0; j < 4; ++j) {
 							ResetDisRect(r[i], 4);
-							ReplaceDisRect(i, j);
+							CrossReplaceDisRect(i, j);
 							if (!start_cross) {
 								start_cross = true;
 								glutTimerFunc(100, TimerFunction, 1);
@@ -247,7 +273,11 @@ GLvoid Mouse(int button, int state, int x, int y)
 					else if (rand_num == 1) {
 						for (int j = 0; j < 4; ++j) {
 							ResetDisRect(r[i], 4);
-							ReplaceDisRect(i, j);
+							UpDownReplaceDisRect(i, j);
+							if (!start_updown) {
+								start_updown = true;
+								glutTimerFunc(100, TimerFunction, 2);
+							}
 						}
 					}
 					// 좌우상하대각선
@@ -278,6 +308,12 @@ GLvoid TimerFunction(int value)
 			MoveRect(r_d[i]);
 		}
 		glutTimerFunc(100, TimerFunction, 1);
+	}
+	else if (value == 2) {
+		for (int i = 0; i < disappear; ++i) {
+			MoveRect(r_d[i]);
+		}
+		glutTimerFunc(100, TimerFunction, 2);
 	}
 
 	glutPostRedisplay();
