@@ -99,7 +99,7 @@ void ProduceRect(const int& x, const int& y)
 void ResetRect()
 {
 	for (int i = 0; i < rect_cnt; ++i)
-		r[i].is_exist = false;
+		r[i].is_exist = true;
 	now_idx = 0;
 }
 
@@ -208,6 +208,12 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 {
 	switch (key) {
 	case 'r':
+		now_idx = 0;
+		// 사각형 생성
+		for (int i = 0; i < rect_cnt; ++i) {
+			int x = rand() % WIDTH, y = rand() % HEIGHT;
+			ProduceRect(x, y);
+		}
 		break;
 	case 'q':
 		glutDestroyWindow(winID);
