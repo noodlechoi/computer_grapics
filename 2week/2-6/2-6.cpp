@@ -37,7 +37,6 @@ GLvoid TimerFunction(int value);
 const int rect_cnt = 5;
 const int disappear = rect_cnt * 8;
 
-
 int winID;
 Rect r[rect_cnt];
 Rect r_d[disappear];
@@ -117,6 +116,19 @@ void ResetDisRect(const Rect& r, int cnt)
 		r_d[dis_idx % disappear].color[j] = r.color[j];
 
 	dis_idx++;
+}
+
+// 분해
+void ReplaceDisRect(Point& p, int i, int j)
+{
+	if (j == 0)
+		r_d[dis_idx % disappear - 1].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+	else if (j == 1)
+		r_d[dis_idx % disappear - 1].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
+	else if (j == 2)
+		r_d[dis_idx % disappear - 1].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
+	else if (j == 3)
+		r_d[dis_idx % disappear - 1].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
 }
 
 // 상하좌우
@@ -207,14 +219,8 @@ GLvoid Mouse(int button, int state, int x, int y)
 					if (rand_num == 0) {
 						for (int j = 0; j < 4; ++j) {
 							ResetDisRect(r[i], 4);
-							if(j == 0)
-								r_d[dis_idx % disappear - 1].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
-							else if (j == 1)
-								r_d[dis_idx % disappear - 1].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
-							else if (j == 2)
-								r_d[dis_idx % disappear - 1].p = { r[i].p.x - r[i].size_x / 2,  r[i].p.y + r[i].size_y / 2 };
-							else if (j == 3)
-								r_d[dis_idx % disappear - 1].p = { r[i].p.x + r[i].size_x / 2,  r[i].p.y - r[i].size_y / 2 };
+							ReplaceDisRect(r_d[dis_idx % disappear - 1].p, i, j);
+							
 						}
 					}
 					// 대각선
