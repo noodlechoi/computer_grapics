@@ -290,7 +290,7 @@ GLvoid Mouse(int button, int state, int x, int y)
 					r[i].is_exist = false;
 
 					// 랜덤적으로
-					int rand_num = 2;
+					int rand_num = rand() % 3;
 					// 대각선
 					if (rand_num == 0) {
 						// 나누기, 타이머 함수
