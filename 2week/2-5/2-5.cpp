@@ -32,12 +32,15 @@ GLvoid drawScene(GLvoid);
 GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
 GLvoid Keyboard(unsigned char key, int x, int y);
+GLvoid Motion(int x, int y);
 
 const int rect_cnt = 30;
 
 int winID;
 Rect r[rect_cnt];
+Rect m_r;
 int now_idx;
+bool left_button;
 
 void SetColor(Rect& r)
 {
@@ -69,7 +72,14 @@ bool Conflict(const Rect& r, const int& x, const int& y)
 		return false;
 }
 
-// 마우스 클릭 시 사각형 생성
+void MoveRect(Rect& r, const int& x, const int& y)
+{
+	Point p = ConvertPoint(x, y);
+
+	r.p = p;
+}
+
+// 사각형 생성
 void ProduceRect(const int& x, const int& y)
 {
 	// 좌표계 변환
@@ -93,13 +103,21 @@ void ResetRect()
 	now_idx = 0;
 }
 
+// 지우개 사각형 초기화
+void InitRect(Rect& r)
+{
+	r.size_x = 0.2f;
+	r.size_y = 0.2f;
+	SetColor(r);
+}
+
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 { //--- 윈도우 생성하기
 	glutInit(&argc, argv); // glut 초기화
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // 디스플레이 모드 설정
 	glutInitWindowPosition(100, 100); // 윈도우의 위치 지정
 	glutInitWindowSize(WIDTH, HEIGHT); // 윈도우의 크기 지정
-	winID = glutCreateWindow("실습 4"); // 윈도우 생성(윈도우 이름)
+	winID = glutCreateWindow("실습 5"); // 윈도우 생성(윈도우 이름)
 
 	//--- GLEW 초기화하기
 	glewExperimental = GL_TRUE;
@@ -119,10 +137,13 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 		int x = rand() % WIDTH, y = rand() % HEIGHT;
 		ProduceRect(x, y);
 	}
+	// 지우개 사각형 초기화
+	InitRect(m_r);
 
 	glutDisplayFunc(drawScene); // 출력 함수의 지정
 	glutReshapeFunc(Reshape); // 다시 그리기 함수 지정
 	glutMouseFunc(Mouse);
+	glutMotionFunc(Motion);
 	glutKeyboardFunc(Keyboard);
 	glutMainLoop(); // 이벤트 처리 시작
 }
@@ -148,6 +169,9 @@ GLvoid drawScene() //--- 콜백 함수: 그리기 콜백 함수
 		if (r[i].is_exist)
 			DrawRect(r[i]);
 	}
+	// 지우개 사각형 그리기
+	if(m_r.is_exist)
+		DrawRect(m_r);
 
 	glutSwapBuffers(); // 화면에 출력하기
 }
@@ -160,6 +184,23 @@ GLvoid Reshape(int w, int h) //--- 콜백 함수: 다시 그리기 콜백 함수
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		left_button = true;
+		// 지우개 사각형
+		m_r.is_exist = true;
+		m_r.p = ConvertPoint(x, y);
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		left_button = false;
+		m_r.is_exist = false;
+	}
+
+}
+
+GLvoid Motion(int x, int y)
+{
+	if (left_button) {
+		m_r.p = ConvertPoint(x, y);
+		glutPostRedisplay();
 	}
 }
 
