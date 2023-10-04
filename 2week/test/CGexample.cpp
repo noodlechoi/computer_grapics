@@ -55,8 +55,8 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 GLvoid drawScene()
 {
 	//--- 변경된 배경색 설정
-	//glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-	glClearColor(1.0, 1.0, 1.0, 1.0f);
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	//glClearColor(1.0, 1.0, 1.0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//--- 렌더링 파이프라인에 세이더 불러오기
 	glUseProgram(shaderProgramID);
