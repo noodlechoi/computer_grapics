@@ -18,7 +18,9 @@ typedef struct Point
 const GLfloat size = 10.0;
 GLfloat vertexPos[3][3];
 GLfloat vertexCol[3][3];
-GLuint vao, vbo[2];
+GLuint vao;//, vbo[2];
+
+GLuint TriPosVbo, TriColorVbo;
 int idx;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
@@ -88,11 +90,17 @@ GLvoid drawScene()
 	glEnableVertexAttribArray(ColorLocation);
 
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // VBO Bind
+		glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo); // VBO Bind
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+		// PosLocation			- Location 번호
+		// 3					- VerTex Size (x, y, z 속성의 Vec3이니 3) 
+		// GL_FLOAT, GL_FALSE	- 자료형과 Normalize 여부
+		// sizeof(float) * 3	- VerTex 마다의 공백 크기 (한 정점마다 메모리 간격)
+		//			(0과 같음)	- 0 일 경우 자동으로 2번째 인자(3) x 3번째 인자(float)로 설정
+		// 0					- 데이터 시작 offset (0이면 데이터 처음부터 시작)
 	}
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // VBO Bind
+		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo); // VBO Bind
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	}
 	glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
@@ -127,17 +135,24 @@ GLvoid Reshape(int w, int h)
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-		//// 클릭한 부분으로 초기화
-		//Point p = ConvertPoint(x, y);
-		//for (int i = 0; i < 3; ++i) {
-		//	vertexPos[i][0] = p.x;
-		//	vertexPos[i][1] = p.y;
-		//	vertexPos[i][2] = 0.0;
+		// 클릭한 부분으로 초기화
+		const GLfloat size = 0.5f;
+		Point p = ConvertPoint(x, y);
+		
+		vertexPos[0][0] = p.x;
+		vertexPos[0][1] = p.y + size;
+		vertexPos[0][2] = 0.0;
 
-		//}
+		vertexPos[1][0] = p.x - size;
+		vertexPos[1][1] = p.y - size;
+		vertexPos[1][2] = 0.0;
 
-		//// vbo
-		//InitBuffer();
+		vertexPos[2][0] = p.x + size;
+		vertexPos[2][1] = p.y - size;
+		vertexPos[2][2] = 0.0;
+
+		// vbo
+		InitBuffer();
 	}
 }
 
@@ -151,18 +166,11 @@ void InitBuffer()
 	glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
 	glBindVertexArray(vao); //--- VAO를 바인드하기
 
-	// vbo 생성
-	glGenBuffers(1, vbo);
-	// vbo bind
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	// buffer에 데이터 넣기
+	glGenBuffers(1, &TriPosVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPos), vertexPos, GL_STATIC_DRAW);
-
-	// vbo 생성
-	glGenBuffers(1, vbo);
-	// vbo bind
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	// buffer에 데이터 넣기
+	glGenBuffers(1, &TriColorVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexCol), vertexCol, GL_STATIC_DRAW);
 }
 
