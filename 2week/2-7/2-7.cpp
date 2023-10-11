@@ -18,10 +18,11 @@ typedef struct Point
 const GLfloat size = 10.0;
 GLfloat vertexPos[3][3];
 GLfloat vertexCol[3][3];
-GLuint vao;//, vbo[2];
+GLuint vao; //, vbo[2];
 
-GLuint TriPosVbo, TriColorVbo;
+GLuint TriPosVbo[10], TriColorVbo[10];
 int idx;
+
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -82,31 +83,28 @@ GLvoid drawScene()
 	//--- 사용할 VAO 불러오기
 	glBindVertexArray(vao);
 
-	// Location 번호 저장
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
+	for (int i = 0; i < 10; ++i) {
 
-	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
-	glEnableVertexAttribArray(ColorLocation);
+		// Location 번호 저장
+		int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
+		int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
 
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo); // VBO Bind
-		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-		// PosLocation			- Location 번호
-		// 3					- VerTex Size (x, y, z 속성의 Vec3이니 3) 
-		// GL_FLOAT, GL_FALSE	- 자료형과 Normalize 여부
-		// sizeof(float) * 3	- VerTex 마다의 공백 크기 (한 정점마다 메모리 간격)
-		//			(0과 같음)	- 0 일 경우 자동으로 2번째 인자(3) x 3번째 인자(float)로 설정
-		// 0					- 데이터 시작 offset (0이면 데이터 처음부터 시작)
+		glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
+		glEnableVertexAttribArray(ColorLocation);
+
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo[i]); // VBO Bind
+			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+		}
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo[i]); // VBO Bind
+			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+		}
+		glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
+
+		glDisableVertexAttribArray(PosLocation); // Disable 필수!
+		glDisableVertexAttribArray(ColorLocation);
 	}
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo); // VBO Bind
-		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	}
-	glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
-
-	glDisableVertexAttribArray(PosLocation); // Disable 필수!
-	glDisableVertexAttribArray(ColorLocation);
 	
 
 
@@ -136,7 +134,7 @@ GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 		// 클릭한 부분으로 초기화
-		const GLfloat size = 0.5f;
+		const GLfloat size = 0.3f;
 		Point p = ConvertPoint(x, y);
 		
 		vertexPos[0][0] = p.x;
@@ -150,6 +148,12 @@ GLvoid Mouse(int button, int state, int x, int y)
 		vertexPos[2][0] = p.x + size;
 		vertexPos[2][1] = p.y - size;
 		vertexPos[2][2] = 0.0;
+
+		for (int i = 0; i < 3; ++i) {
+			vertexCol[i][0] = p.x;
+			vertexCol[i][1] = p.y;
+			vertexCol[i][2] = 0;
+		}
 
 		// vbo
 		InitBuffer();
@@ -166,12 +170,13 @@ void InitBuffer()
 	glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
 	glBindVertexArray(vao); //--- VAO를 바인드하기
 
-	glGenBuffers(1, &TriPosVbo);
-	glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo);
+	glGenBuffers(1, &TriPosVbo[idx % 10]);
+	glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo[idx % 10]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPos), vertexPos, GL_STATIC_DRAW);
-	glGenBuffers(1, &TriColorVbo);
-	glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo);
+	glGenBuffers(1, &TriColorVbo[idx % 10]);
+	glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo[idx % 10]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexCol), vertexCol, GL_STATIC_DRAW);
+	idx++;
 }
 
 void make_shaderProgram()
