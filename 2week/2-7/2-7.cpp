@@ -15,14 +15,24 @@ typedef struct Point
 	float x, y;
 }Point;
 
+typedef enum Shape
+{
+	dot = 1,
+	line,
+	tri,
+	rec
+}Shape;
+
 const GLfloat size = 10.0;
 GLfloat vertexPos[3][3];
 GLfloat vertexCol[3][3];
+GLfloat v[3][3];
 GLuint vao; //, vbo[2];
 
-GLuint TriPosVbo[10], TriColorVbo[10];
+GLuint TriPosVbo[20], TriColorVbo[20];
 int idx;
-
+unsigned char command;
+int shape[10];
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -34,7 +44,7 @@ void make_fragmentShaders();
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
-void InitVAO();
+GLvoid Keyboard(unsigned char key, int x, int y);
 void InitBuffer();
 char* filetobuf(const char*);
 
@@ -47,7 +57,6 @@ Point ConvertPoint(const int& x, const int& y)
 	return tmp;
 }
 
-
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 {
 	//--- 윈도우 생성하기
@@ -55,18 +64,21 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("Example1");
+	glutCreateWindow("실습 7");
 
 	//--- GLEW 초기화하기
 	glewExperimental = GL_TRUE;
 	glewInit();
 	make_shaderProgram();
 
-	// vbo
-	InitBuffer();
+	// vao
+	glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
+	glBindVertexArray(vao); //--- VAO를 바인드하기
+
 
 	glutDisplayFunc(drawScene);
 	glutMouseFunc(Mouse);
+	glutKeyboardFunc(Keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 }
@@ -83,31 +95,45 @@ GLvoid drawScene()
 	//--- 사용할 VAO 불러오기
 	glBindVertexArray(vao);
 
-	for (int i = 0; i < 10; ++i) {
+	if (command) {
+		for (int i = 0; i < 20; ++i) {
 
-		// Location 번호 저장
-		int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
-		int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
+			// Location 번호 저장
+			int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
+			int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
 
-		glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
-		glEnableVertexAttribArray(ColorLocation);
+			glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
+			glEnableVertexAttribArray(ColorLocation);
 
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo[i]); // VBO Bind
-			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+			{
+				glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo[i]); // VBO Bind
+				glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+			}
+			{
+				glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo[i]); // VBO Bind
+				glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+			}
+			if (shape[i % 10 + 10] == dot) {
+				glPointSize(5.0);
+				glDrawArrays(GL_POINTS, 0, 1);
+			}
+			else if (shape[i % 10 + 10] == tri) {
+				glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
+				
+			}
+			else if (shape[i % 10 + 10] == line) {
+				glDrawArrays(GL_LINES, 0, 2); // 설정대로 출력
+			}
+			else if (shape[i % 10 + 10] == rec) {
+				glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
+			}
+
+			glDisableVertexAttribArray(PosLocation); // Disable 필수!
+			glDisableVertexAttribArray(ColorLocation);
 		}
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo[i]); // VBO Bind
-			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-		}
-		glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
 
-		glDisableVertexAttribArray(PosLocation); // Disable 필수!
-		glDisableVertexAttribArray(ColorLocation);
 	}
 	
-
-
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
 //--- 다시그리기 콜백 함수
@@ -130,24 +156,71 @@ GLvoid Reshape(int w, int h)
 
 클릭 시 점 그리는 거
 */
+GLvoid Keyboard(unsigned char key, int x, int y)
+{
+	command = key;
+}
+
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 		// 클릭한 부분으로 초기화
-		const GLfloat size = 0.3f;
+		const GLfloat size = 0.2f;
 		Point p = ConvertPoint(x, y);
 		
-		vertexPos[0][0] = p.x;
-		vertexPos[0][1] = p.y + size;
-		vertexPos[0][2] = 0.0;
+		if (command == 't') {
+			vertexPos[0][0] = p.x;
+			vertexPos[0][1] = p.y + size;
+			vertexPos[0][2] = 0.0;
 
-		vertexPos[1][0] = p.x - size;
-		vertexPos[1][1] = p.y - size;
-		vertexPos[1][2] = 0.0;
+			vertexPos[1][0] = p.x - size;
+			vertexPos[1][1] = p.y - size;
+			vertexPos[1][2] = 0.0;
 
-		vertexPos[2][0] = p.x + size;
-		vertexPos[2][1] = p.y - size;
-		vertexPos[2][2] = 0.0;
+			vertexPos[2][0] = p.x + size;
+			vertexPos[2][1] = p.y - size;
+			vertexPos[2][2] = 0.0;
+		}
+		else if (command == 'p') {
+			vertexPos[0][0] = p.x;
+			vertexPos[0][1] = p.y;
+			vertexPos[0][2] = 0.0;
+		}
+		else if (command == 'l') {
+			vertexPos[0][0] = p.x;
+			vertexPos[0][1] = p.y;
+			vertexPos[0][2] = 0.0;
+
+			vertexPos[1][0] = p.x;
+			vertexPos[1][1] = p.y + size;
+			vertexPos[1][2] = 0.0;
+
+		}
+		else if (command == 'r') {
+			vertexPos[0][0] = p.x - size;
+			vertexPos[0][1] = p.y + size;
+			vertexPos[0][2] = 0.0;
+
+			vertexPos[1][0] = p.x - size;
+			vertexPos[1][1] = p.y - size;
+			vertexPos[1][2] = 0.0;
+
+			vertexPos[2][0] = p.x + size;
+			vertexPos[2][1] = p.y - size;
+			vertexPos[2][2] = 0.0;
+
+			v[0][0] = p.x - size;
+			v[0][1] = p.y + size;
+			v[0][2] = 0.0;
+
+			v[1][0] = p.x + size;
+			v[1][1] = p.y + size;
+			v[1][2] = 0.0;
+
+			v[2][0] = p.x + size;
+			v[2][1] = p.y - size;
+			v[2][2] = 0.0;
+		}
 
 		for (int i = 0; i < 3; ++i) {
 			vertexCol[i][0] = p.x;
@@ -160,23 +233,40 @@ GLvoid Mouse(int button, int state, int x, int y)
 	}
 }
 
-void InitVAO()
-{
-	
-}
 
 void InitBuffer()
 {
-	glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
-	glBindVertexArray(vao); //--- VAO를 바인드하기
+	// 삼각형
+	if (command) {
+		glGenBuffers(1, &TriPosVbo[idx % 10]);
+		glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo[idx % 10]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPos), vertexPos, GL_STATIC_DRAW);
+		glGenBuffers(1, &TriColorVbo[idx % 10]);
+		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo[idx % 10]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexCol), vertexCol, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &TriPosVbo[idx % 10]);
-	glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo[idx % 10]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPos), vertexPos, GL_STATIC_DRAW);
-	glGenBuffers(1, &TriColorVbo[idx % 10]);
-	glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo[idx % 10]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexCol), vertexCol, GL_STATIC_DRAW);
-	idx++;
+		if (command == 'p') {
+			shape[idx % 10] = dot;
+		}
+		else if (command == 't') {
+			shape[idx % 10] = tri;
+		}
+		else if (command == 'l') {
+			shape[idx % 10] = line;
+		}
+		else if (command == 'r') {
+			shape[idx % 10] = rec;
+
+			glGenBuffers(1, &TriPosVbo[idx % 10 + 10]);
+			glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo[idx % 10 + 10]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
+			glGenBuffers(1, &TriColorVbo[idx % 10 + 10]);
+			glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo[idx % 10 + 10]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
+		}
+
+		idx++;
+	}
 }
 
 void make_shaderProgram()
