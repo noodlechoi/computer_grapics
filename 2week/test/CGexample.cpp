@@ -68,32 +68,32 @@ GLvoid drawScene()
 	///////////
 	///추가 부분
 	///////////
-	
-	// Location 번호 저장
-	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
-	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
+	//
+	//// Location 번호 저장
+	//int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
+	//int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
 
-	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
-	glEnableVertexAttribArray(ColorLocation);
+	//glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
+	//glEnableVertexAttribArray(ColorLocation);
 
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo); // VBO Bind
-		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-		// PosLocation			- Location 번호
-		// 3					- VerTex Size (x, y, z 속성의 Vec3이니 3) 
-		// GL_FLOAT, GL_FALSE	- 자료형과 Normalize 여부
-		// sizeof(float) * 3	- VerTex 마다의 공백 크기 (한 정점마다 메모리 간격)
-		//			(0과 같음)	- 0 일 경우 자동으로 2번째 인자(3) x 3번째 인자(float)로 설정
-		// 0					- 데이터 시작 offset (0이면 데이터 처음부터 시작)
-	}
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo); // VBO Bind
-		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	}
-	glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
+	//{
+	//	glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo); // VBO Bind
+	//	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//	// PosLocation			- Location 번호
+	//	// 3					- VerTex Size (x, y, z 속성의 Vec3이니 3) 
+	//	// GL_FLOAT, GL_FALSE	- 자료형과 Normalize 여부
+	//	// sizeof(float) * 3	- VerTex 마다의 공백 크기 (한 정점마다 메모리 간격)
+	//	//			(0과 같음)	- 0 일 경우 자동으로 2번째 인자(3) x 3번째 인자(float)로 설정
+	//	// 0					- 데이터 시작 offset (0이면 데이터 처음부터 시작)
+	//}
+	//{
+	//	glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo); // VBO Bind
+	//	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//}
+	//glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
 
-	glDisableVertexAttribArray(PosLocation); // Disable 필수!
-	glDisableVertexAttribArray(ColorLocation);
+	glDisableVertexAttribArray(0); // Disable 필수!
+	glDisableVertexAttribArray(1);
 
 	///////////
 	///////////
@@ -143,6 +143,10 @@ void InitBuffer()
 		glGenBuffers(1, &TriColorVbo);
 		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(tricolor), tricolor, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0); // Enable 필수! 사용하겠단 의미
+		glEnableVertexAttribArray(1);
+
 	}
 }
 

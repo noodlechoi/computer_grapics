@@ -23,16 +23,19 @@ typedef enum Shape
 	rec
 }Shape;
 
-const GLfloat size = 10.0;
-GLfloat vertexPos[3][3];
-GLfloat vertexCol[3][3];
-GLfloat v[3][3];
-GLuint vao; //, vbo[2];
+GLfloat pos[3][3], color[3][3], data[] = {
+ 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   
+	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
+	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  
+	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  
+};
+const GLfloat triShape[3][3] = { //--- 삼각형 위치 값
+{ -0.5, -0.5, 0.0 }, { 0.5, -0.5, 0.0 }, { 0.0, 0.5, 0.0} };
+const GLfloat colors[3][3] = { //--- 삼각형 꼭지점 색상
+{ 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
 
-GLuint TriPosVbo[20], TriColorVbo[20];
-int idx;
-unsigned char command;
-int shape[10];
+GLuint vao, vbo;
+
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -71,10 +74,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	glewInit();
 	make_shaderProgram();
 
-	// vao
-	glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
-	glBindVertexArray(vao); //--- VAO를 바인드하기
-
+	InitBuffer();
 
 	glutDisplayFunc(drawScene);
 	glutMouseFunc(Mouse);
@@ -85,16 +85,15 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 
 GLvoid drawScene()
 {
-	//--- 변경된 배경색 설정
-	//glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	glClearColor(1.0, 1.0, 1.0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// 쉐이터 불러오기
+	//--- 렌더링 파이프라인에 세이더 불러오기
 	glUseProgram(shaderProgramID);
 	//--- 사용할 VAO 불러오기
 	glBindVertexArray(vao);
-
+	//--- 삼각형 그리기
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
@@ -115,7 +114,22 @@ GLvoid Mouse(int button, int state, int x, int y)
 
 void InitBuffer()
 {
-	
+	// vao bind
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	// vbo bind
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	// data input
+	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+	// 위치 attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	// 컬러 attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 }
 
 void make_shaderProgram()

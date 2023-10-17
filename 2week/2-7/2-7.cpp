@@ -124,9 +124,9 @@ GLvoid drawScene()
 			else if (shape[i % 10 + 10] == line) {
 				glDrawArrays(GL_LINES, 0, 2); // 설정대로 출력
 			}
-			else if (shape[i % 10 + 10] == rec) {
-				glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
-			}
+			//else if (shape[i % 10 + 10] == rec) {
+			//	glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
+			//}
 
 			glDisableVertexAttribArray(PosLocation); // Disable 필수!
 			glDisableVertexAttribArray(ColorLocation);
