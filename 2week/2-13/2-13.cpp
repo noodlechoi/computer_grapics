@@ -23,16 +23,7 @@ typedef enum Shape
 	rec
 }Shape;
 
-const GLfloat size = 10.0;
-GLfloat vertexPos[3][3];
-GLfloat vertexCol[3][3];
-GLfloat v[3][3];
-GLuint vao; //, vbo[2];
-
-GLuint TriPosVbo[20], TriColorVbo[20];
-int idx;
-unsigned char command;
-int shape[10];
+GLuint vao, vbo[2];
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -64,26 +55,57 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("실습 7");
+	glutCreateWindow("실습 13");
 
 	//--- GLEW 초기화하기
 	glewExperimental = GL_TRUE;
 	glewInit();
 	make_shaderProgram();
 
+	InitBuffer();
+
 	glutDisplayFunc(drawScene);
 	glutMouseFunc(Mouse);
-	glutKeyboardFunc(Keyboard);
+	//glutKeyboardFunc(Keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 }
 
 GLvoid drawScene()
 {
-	//--- 변경된 배경색 설정
-	//glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	// 배경 출력
 	glClearColor(1.0, 1.0, 1.0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//--- 렌더링 파이프라인에 세이더 불러오기
+	glUseProgram(shaderProgramID);
+	//--- 사용할 VAO 불러오기
+	glBindVertexArray(vao);
+
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
+
+	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
+	glEnableVertexAttribArray(ColorLocation);
+
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // VBO Bind
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+		// PosLocation			- Location 번호
+		// 3					- VerTex Size (x, y, z 속성의 Vec3이니 3) 
+		// GL_FLOAT, GL_FALSE	- 자료형과 Normalize 여부
+		// sizeof(float) * 3	- VerTex 마다의 공백 크기 (한 정점마다 메모리 간격)
+		//			(0과 같음)	- 0 일 경우 자동으로 2번째 인자(3) x 3번째 인자(float)로 설정
+		// 0					- 데이터 시작 offset (0이면 데이터 처음부터 시작)
+	}
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // VBO Bind
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	}
+	glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
+
+	glDisableVertexAttribArray(PosLocation); // Disable 필수!
+	glDisableVertexAttribArray(ColorLocation);
 
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
@@ -94,30 +116,48 @@ GLvoid Reshape(int w, int h)
 }
 
 /*
-화면에 기본 도형 그리기
- 키보드 명령에 따라, 마우스를 누르는 위치에 점, 선, 삼각형 또는 사각형 (삼각형 2개 붙이기) 그린다.
- 색상과 크기는 자율적으로 정하고, 최대 10개의 도형을 그린다.
- 키보드 명령
- p: 점 그리기
- l: 선 그리기
- t: 삼각형 그리기
- r: 사각형 그리기
- w/a/s/d: 그린 모든 도형이 화면에서 위/좌/아래/우측으로 이동한다.
- c: 모든 도형을 삭제한다
-
-클릭 시 점 그리는 거
+마우스를 이용하여 사각형 편집하기
+ 800x600 크기의 윈도우를 띄운다
+ 화면 중앙에 사각형을 그린다.
+ 마우스로 사각형의 꼭짓점을 누르고 드래그하면 꼭짓점이 이동된다.
+ 사각형의 내부이고 꼭지점과 떨어진 부근을 누르고 드래그하면 사각형이 이동된다.
 */
+
 GLvoid Keyboard(unsigned char key, int x, int y)
 {
 }
 
 GLvoid Mouse(int button, int state, int x, int y)
 {
+
 }
 
 
 void InitBuffer()
 {
+	glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
+	glBindVertexArray(vao); //--- VAO를 바인드하기
+
+	{
+		const GLfloat size = 0.5;
+
+		const GLfloat rec[4][3] = {
+			// 좌 상단
+			{-size, size, 0.0},
+			// 우 하단
+			{size, -size, 0.0},
+			// 좌 하단
+			{-size, -size, 0.0},
+			// 우 상단
+			{size, size, 0.0}
+		};
+		const GLfloat color[3][3] = { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
+		glGenBuffers(2, vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(rec), rec, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+	}
 }
 
 void make_shaderProgram()
