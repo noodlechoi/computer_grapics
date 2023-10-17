@@ -6,6 +6,9 @@
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>
+#include <gl/glm/glm.hpp>
+#include <gl/glm/ext.hpp>
+#include <gl/glm/gtc/matrix_transform.hpp>
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -15,27 +18,25 @@ typedef struct Point
 	float x, y;
 }Point;
 
-typedef enum Shape
-{
-	dot = 1,
-	line,
-	tri,
-	rec
-}Shape;
-
-GLfloat pos[3][3], color[3][3], data[] = {
- 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   
-	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,
-	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,  
-	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,  
+// 좌표축
+const GLfloat center_line[6][3] = {
+	// x축
+	{-1.0, 0.0, 0.0}, {1.0, 0.0, 0.0},
+	// y축
+	{0.0, -1.0, 0.0}, {0.0, 1.0, 0.0},
+	// z축
+	{0.0, 0.0, -1.0}, {0.0, 0.0, 1.0}
 };
-const GLfloat triShape[3][3] = { //--- 삼각형 위치 값
-{ -0.5, -0.5, 0.0 }, { 0.5, -0.5, 0.0 }, { 0.0, 0.5, 0.0} };
-const GLfloat colors[3][3] = { //--- 삼각형 꼭지점 색상
-{ 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
+const GLfloat center_color[6][3] = {
+	// x축
+	{1.0, 0.0, 0.0},{1.0, 0.0, 0.0},
+	// y축
+	{0.0, 1.0, 0.0},{0.0, 1.0, 0.0},
+	// z축
+	{0.0, 0.0, 1.0},{0.0, 0.0, 1.0}
+};
 
-GLuint vao, vbo;
-
+GLuint vao, center_vbo, center_c_vbo;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -64,7 +65,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 {
 	//--- 윈도우 생성하기
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(800, 600);
 	glutCreateWindow("실습 14");
@@ -76,24 +77,48 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 
 	InitBuffer();
 
+	// 깊이 검사 설정
+	glEnable(GL_DEPTH_TEST);
 	glutDisplayFunc(drawScene);
 	glutMouseFunc(Mouse);
 	glutKeyboardFunc(Keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
+	// 깊이 
+	glDisable(GL_DEPTH_TEST);
+
 }
 
 GLvoid drawScene()
 {
 	glClearColor(1.0, 1.0, 1.0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	// 좌표축 그리기
 	//--- 렌더링 파이프라인에 세이더 불러오기
 	glUseProgram(shaderProgramID);
 	//--- 사용할 VAO 불러오기
 	glBindVertexArray(vao);
-	//--- 삼각형 그리기
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
+
+	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
+	glEnableVertexAttribArray(ColorLocation);
+
+	// 좌표축 그리기
+	for (int i = 0; i < 2; ++i) {
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, center_vbo); // VBO Bind
+			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(i * 6 * sizeof(float)));
+		}
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, center_c_vbo); // VBO Bind
+			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(i * 6 * sizeof(float)));
+		}
+		glDrawArrays(GL_LINES, 0, 2); // 설정대로 출력
+	}
+	glDisableVertexAttribArray(PosLocation); // Disable 필수!
+	glDisableVertexAttribArray(ColorLocation);
 
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
@@ -105,6 +130,34 @@ GLvoid Reshape(int w, int h)
 
 GLvoid Keyboard(unsigned char key, int x, int y)
 {
+	switch (key) {
+	case '1':
+		break;
+	case '2':
+		break;
+	case '3':
+		break;
+	case '4':
+		break;
+	case '5':
+		break;
+	case '6':
+		break;
+	case '7':
+		break;
+	case '8':
+		break;
+	case '9':
+		break;
+	case '0':
+		break;
+	case 'c':
+		break;
+	case 't':
+		break;
+	default:
+		break;
+	}
 }
 
 GLvoid Mouse(int button, int state, int x, int y)
@@ -114,22 +167,15 @@ GLvoid Mouse(int button, int state, int x, int y)
 
 void InitBuffer()
 {
-	// vao bind
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	// vbo bind
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	// data input
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-
-	// 위치 attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// 컬러 attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	glGenBuffers(1, &center_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, center_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(center_line), center_line, GL_STATIC_DRAW);
+	glGenBuffers(1, &center_c_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, center_c_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(center_color), center_color, GL_STATIC_DRAW);
 }
 
 void make_shaderProgram()
