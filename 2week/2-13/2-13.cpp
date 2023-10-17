@@ -31,7 +31,11 @@ GLfloat rec[4][3] = {
 };
 
 bool is_click;
+bool is_body;
+// 이전 인덱스
 int idx;
+// 이전 좌표
+Point before_p;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -149,6 +153,20 @@ GLvoid Motion(int x, int y)
 
 		glutPostRedisplay();
 	}
+	else if (is_body) {
+		Point p = ConvertPoint(x, y);
+		for (int i = 0; i < 4; ++i) {
+			rec[i][0] += p.x - before_p.x;
+			rec[i][1] += p.y - before_p.y;
+		}
+
+		glGenBuffers(1, vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(rec), rec, GL_STATIC_DRAW);
+		before_p = p;
+
+		glutPostRedisplay();
+	}
 }
 
 GLvoid Mouse(int button, int state, int x, int y)
@@ -164,10 +182,27 @@ GLvoid Mouse(int button, int state, int x, int y)
 			}
 		}
 		// 전체
+		// 좌하단 , 좌상단 , 우하단 , 우상단
+		Point max = {}, min = {};
+		for (int i = 0; i < 4; ++i) {
+			if (rec[i][0] > max.x)
+				max.x = rec[i][0];
+			if(rec[i][1] > max.y)
+				max.y = rec[i][1];
+			if (rec[i][0] < min.x)
+				min.x = rec[i][0];
+			if (rec[i][1] < min.y)
+				min.y = rec[i][1];
+		}
 
+		if ((p.x > min.x && p.x < max.x) && (p.y > min.y && p.y < max.y)) {
+			is_body = true;
+			before_p = p;
+		}
 	}
 	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		is_click = false;
+		is_body = false;
 	}
 }
 
