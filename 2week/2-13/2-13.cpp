@@ -15,14 +15,6 @@ typedef struct Point
 	float x, y;
 }Point;
 
-typedef enum Shape
-{
-	dot = 1,
-	line,
-	tri,
-	rec
-}Shape;
-
 GLuint vao, vbo[2];
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
@@ -65,7 +57,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	InitBuffer();
 
 	glutDisplayFunc(drawScene);
-	glutMouseFunc(Mouse);
+	//glutMouseFunc(Mouse);
 	//glutKeyboardFunc(Keyboard);
 	glutReshapeFunc(Reshape);
 	glutMainLoop();

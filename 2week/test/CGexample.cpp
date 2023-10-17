@@ -15,12 +15,12 @@
 
 //--- 메인 함수
 //--- 함수 선언 추가하기
-const GLfloat triShape[3][3] = { //--- 삼각형 위치 값
-{ -0.75, -0.25, 0.0 }, { -0.25, -0.25, 0.0 }, { -0.5, 0.25, 0.0} };
-const GLfloat colors[3][3] = { //--- 삼각형 꼭지점 색상
-{ 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
+//const GLfloat triShape[3][3] = { //--- 삼각형 위치 값
+//{ -0.75, -0.25, 0.0 }, { -0.25, -0.25, 0.0 }, { -0.5, 0.25, 0.0} };
+//const GLfloat colors[3][3] = { //--- 삼각형 꼭지점 색상
+//{ 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
 GLuint vao, vbo[2];
-GLuint TriPosVbo, TriColorVbo;
+//GLuint TriPosVbo, TriColorVbo;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -54,22 +54,16 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 
 GLvoid drawScene()
 {
-	//--- 변경된 배경색 설정
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-	//glClearColor(1.0, 1.0, 1.0, 1.0f);
+
+	// 배경 출력
+	glClearColor(1.0, 1.0, 1.0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	//--- 렌더링 파이프라인에 세이더 불러오기
 	glUseProgram(shaderProgramID);
 	//--- 사용할 VAO 불러오기
 	glBindVertexArray(vao);
-	//--- 삼각형 그리기
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	///////////
-	///추가 부분
-	///////////
-	//
-	//// Location 번호 저장
 	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
 	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
 
@@ -77,8 +71,8 @@ GLvoid drawScene()
 	glEnableVertexAttribArray(ColorLocation);
 
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo); // VBO Bind
-		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3*sizeof(float)));
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // VBO Bind
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 		// PosLocation			- Location 번호
 		// 3					- VerTex Size (x, y, z 속성의 Vec3이니 3) 
 		// GL_FLOAT, GL_FALSE	- 자료형과 Normalize 여부
@@ -87,17 +81,13 @@ GLvoid drawScene()
 		// 0					- 데이터 시작 offset (0이면 데이터 처음부터 시작)
 	}
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo); // VBO Bind
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // VBO Bind
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	}
 	glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
 
-	glDisableVertexAttribArray(0); // Disable 필수!
-	glDisableVertexAttribArray(1);
-
-	///////////
-	///////////
-	///////////
+	glDisableVertexAttribArray(PosLocation); // Disable 필수!
+	glDisableVertexAttribArray(ColorLocation);
 
 	glutSwapBuffers(); //--- 화면에 출력하기
 }
@@ -109,42 +99,29 @@ GLvoid Reshape(int w, int h)
 
 void InitBuffer()
 {
+
 	glGenVertexArrays(1, &vao); //--- VAO 를 지정하고 할당하기
 	glBindVertexArray(vao); //--- VAO를 바인드하기
-	//glGenBuffers(2, vbo); //--- 2개의 VBO를 지정하고 할당하기
-	////--- 1번째 VBO를 활성화하여 바인드하고, 버텍스 속성 (좌표값)을 저장
-	//glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	////--- 변수 diamond 에서 버텍스 데이터 값을 버퍼에 복사한다.
-	////--- triShape 배열의 사이즈: 9 * float
-	//glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), triShape, GL_STATIC_DRAW);
-	////--- 좌표값을 attribute 인덱스 0번에 명시한다: 버텍스 당 3* float
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	////--- attribute 인덱스 0번을 사용가능하게 함
-	//glEnableVertexAttribArray(0);
-	////--- 2번째 VBO를 활성화 하여 바인드 하고, 버텍스 속성 (색상)을 저장
-	//glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	////--- 변수 colors에서 버텍스 색상을 복사한다.
-	////--- colors 배열의 사이즈: 9 *float 
-	//glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), colors, GL_STATIC_DRAW);
-	////--- 색상값을 attribute 인덱스 1번에 명시한다: 버텍스 당 3*float
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	////--- attribute 인덱스 1번을 사용 가능하게 함.
-	//glEnableVertexAttribArray(1);
-
 
 	{
-		const GLfloat tripos[4][3] = { //--- 삼각형 위치 값
-		{ 0.75, -0.25, 0.0 }, { 0.25, -0.25, 0.0 }, { 0.5, 0.25, 0.0}, {0.75, -0.25, 0.0} };
-		const GLfloat tricolor[3][3] = { //--- 삼각형 꼭지점 색상
-		{ 1.0, 1.0, 0.0 }, { 0.0, 1.0, 1.0 }, { 1.0, 0.0, 1.0 } };
-		glGenBuffers(1, &TriPosVbo); 
-		glBindBuffer(GL_ARRAY_BUFFER, TriPosVbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(tripos), tripos, GL_STATIC_DRAW);
-		glGenBuffers(1, &TriColorVbo);
-		glBindBuffer(GL_ARRAY_BUFFER, TriColorVbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(tricolor), tricolor, GL_STATIC_DRAW);
+		const GLfloat size = 0.5;
 
-
+		const GLfloat rec[4][3] = {
+			// 좌 상단
+			{-size, size, 0.0},
+			// 우 하단
+			{size, -size, 0.0},
+			// 좌 하단
+			{-size, -size, 0.0},
+			// 우 상단
+			{size, size, 0.0}
+		};
+		const GLfloat color[3][3] = { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
+		glGenBuffers(2, vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(rec), rec, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
 	}
 }
 
