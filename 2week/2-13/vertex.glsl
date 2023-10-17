@@ -9,6 +9,6 @@ out vec3 out_Color; //--- 프래그먼트 세이더에게 전달
 
 void main(void) 
 {
-	gl_Position = vec4 (in_Position.x, in_Position.y, in_Position.z, 1.0);
+	gl_Position = vec4 (in_Position, 1.0);
 	out_Color = in_Color;
 }

@@ -16,6 +16,22 @@ typedef struct Point
 }Point;
 
 GLuint vao, vbo[2];
+const GLfloat size = 0.5;
+
+GLfloat rec[4][3] = {
+	// 좌 하단
+	{-size, -size, 0.0},
+	// 우 하단
+	{size, -size, 0.0},
+	// 좌 상단
+	{-size, size, 0.0},
+	// 우 상단
+	{size, size, 0.0}
+
+};
+
+bool is_click;
+int idx;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -27,7 +43,7 @@ void make_fragmentShaders();
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
-GLvoid Keyboard(unsigned char key, int x, int y);
+GLvoid Motion(int x, int y);
 void InitBuffer();
 char* filetobuf(const char*);
 
@@ -57,9 +73,9 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	InitBuffer();
 
 	glutDisplayFunc(drawScene);
-	//glutMouseFunc(Mouse);
-	//glutKeyboardFunc(Keyboard);
 	glutReshapeFunc(Reshape);
+	glutMouseFunc(Mouse);
+	glutMotionFunc(Motion);
 	glutMainLoop();
 }
 
@@ -83,12 +99,18 @@ GLvoid drawScene()
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // VBO Bind
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-		// PosLocation			- Location 번호
-		// 3					- VerTex Size (x, y, z 속성의 Vec3이니 3) 
-		// GL_FLOAT, GL_FALSE	- 자료형과 Normalize 여부
-		// sizeof(float) * 3	- VerTex 마다의 공백 크기 (한 정점마다 메모리 간격)
-		//			(0과 같음)	- 0 일 경우 자동으로 2번째 인자(3) x 3번째 인자(float)로 설정
-		// 0					- 데이터 시작 offset (0이면 데이터 처음부터 시작)
+
+	}
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // VBO Bind
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	}
+	glDrawArrays(GL_TRIANGLES, 0, 3); // 설정대로 출력
+
+	{
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // VBO Bind
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(3 * sizeof(GLfloat)));
 	}
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // VBO Bind
@@ -115,13 +137,38 @@ GLvoid Reshape(int w, int h)
  사각형의 내부이고 꼭지점과 떨어진 부근을 누르고 드래그하면 사각형이 이동된다.
 */
 
-GLvoid Keyboard(unsigned char key, int x, int y)
+GLvoid Motion(int x, int y)
 {
+	if (is_click) {
+		Point p = ConvertPoint(x, y);
+		rec[idx][0] = p.x;
+		rec[idx][1] = p.y;
+		glGenBuffers(1, vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(rec), rec, GL_STATIC_DRAW);
+
+		glutPostRedisplay();
+	}
 }
 
 GLvoid Mouse(int button, int state, int x, int y)
 {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		Point p = ConvertPoint(x, y);
+		// 꼭짓점
+		for (int i = 0; i < 4; ++i) {
+			if ((p.x >= rec[i][0] - 0.1 && p.x <= rec[i][0] + 0.1) && (p.y >= rec[i][1] - 0.1 && p.y <= rec[i][1] + 0.1)) {
+				is_click = true;
+				idx = i;
+				return;
+			}
+		}
+		// 전체
 
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		is_click = false;
+	}
 }
 
 
@@ -131,18 +178,6 @@ void InitBuffer()
 	glBindVertexArray(vao); //--- VAO를 바인드하기
 
 	{
-		const GLfloat size = 0.5;
-
-		const GLfloat rec[4][3] = {
-			// 좌 상단
-			{-size, size, 0.0},
-			// 우 하단
-			{size, -size, 0.0},
-			// 좌 하단
-			{-size, -size, 0.0},
-			// 우 상단
-			{size, size, 0.0}
-		};
 		const GLfloat color[3][3] = { { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 }, { 0.0, 0.0, 1.0 } };
 		glGenBuffers(2, vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
