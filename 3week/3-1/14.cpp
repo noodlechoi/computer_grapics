@@ -18,25 +18,8 @@ typedef struct Point
 	float x, y;
 }Point;
 
-// 좌표축
-const GLfloat center_line[6][3] = {
-	// x축
-	{-1.0, 0.0, 0.0}, {1.0, 0.0, 0.0},
-	// y축
-	{0.0, -1.0, 0.0}, {0.0, 1.0, 0.0},
-	// z축
-	{0.0, 0.0, -1.0}, {0.0, 0.0, 1.0}
-};
-const GLfloat center_color[6][3] = {
-	// x축
-	{1.0, 0.0, 0.0},{1.0, 0.0, 0.0},
-	// y축
-	{0.0, 1.0, 0.0},{0.0, 1.0, 0.0},
-	// z축
-	{0.0, 0.0, 1.0},{0.0, 0.0, 1.0}
-};
 
-GLuint vao, center_vbo, center_c_vbo;
+GLuint vao, center_vbo, center_c_vbo, four_idx, four_list;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -89,10 +72,21 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 
 }
 
+/*
+3차원 객체, 육면체 또는 사면체의 면을 명령어에 따라 그리기
+ 모든 객체들은 X축으로 10도, y축으로 10도 회전해서 그린다. (3차원 도형이라 약간 기울어지게 그린다)
+ 다음의 키보드 명령어에 따라 도형을 구성하는 각 면을 그린다. 각 면마다 색상을 정해 해당 색상으로 그린다.
+ 1/2/3/4/5/6: 육면체의 각 면을 그린다.
+ 7/8/9/0 : 사면체의 각 면을 그린다.
+ c: 육면체에서 랜덤한 2개의 면을 그린다.
+ t: 사면체에서 랜덤한 2개의 면을 그린다.
+*/
+
 GLvoid drawScene()
 {
 	glClearColor(1.0, 1.0, 1.0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	// 좌표축 그리기
 	//--- 렌더링 파이프라인에 세이더 불러오기
 	glUseProgram(shaderProgramID);
@@ -117,6 +111,11 @@ GLvoid drawScene()
 		}
 		glDrawArrays(GL_LINES, 0, 2); // 설정대로 출력
 	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, four_list); // VBO Bind
+	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glDrawElements(GL_TRIANGLES,12, GL_UNSIGNED_INT, 0);
+
 	glDisableVertexAttribArray(PosLocation); // Disable 필수!
 	glDisableVertexAttribArray(ColorLocation);
 
@@ -170,12 +169,63 @@ void InitBuffer()
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	glGenBuffers(1, &center_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, center_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(center_line), center_line, GL_STATIC_DRAW);
-	glGenBuffers(1, &center_c_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, center_c_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(center_color), center_color, GL_STATIC_DRAW);
+	{
+		// 좌표축
+		const GLfloat center_line[6][3] = {
+			// x축
+			{-1.0, 0.0, 0.0}, {1.0, 0.0, 0.0},
+			// y축
+			{0.0, -1.0, 0.0}, {0.0, 1.0, 0.0},
+			// z축
+			{0.0, 0.0, -1.0}, {0.0, 0.0, 1.0}
+		};
+		const GLfloat center_color[6][3] = {
+			// x축
+			{1.0, 0.0, 0.0},{1.0, 0.0, 0.0},
+			// y축
+			{0.0, 1.0, 0.0},{0.0, 1.0, 0.0},
+			// z축
+			{0.0, 0.0, 1.0},{0.0, 0.0, 1.0}
+		};
+
+		glGenBuffers(1, &center_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, center_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(center_line), center_line, GL_STATIC_DRAW);
+		glGenBuffers(1, &center_c_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, center_c_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(center_color), center_color, GL_STATIC_DRAW);
+	}
+
+	{
+		// four solid
+		const GLfloat size = 0.3;
+		const GLfloat data[5][3] = {
+			// pos
+			{0.0, 0.0, 0.0},	// 0
+			{size, 0.0, 0.0},	// 1
+			{0.0,size, 0.0},	// 2
+			{0.0, 0.0, size},	// 3
+			// color
+			{0.5, 0.5, 0.0}		// 4
+		};
+
+		// index buffer
+		GLuint four_idx_buff[] = { 
+			// pos
+			0, 2, 1, 0, 3, 2, 0, 1, 3, 2, 3, 1,
+			// color
+			4, 4, 4
+		};
+
+		glGenBuffers(1, &four_list);
+		glBindBuffer(GL_ARRAY_BUFFER, four_list);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+
+		glGenBuffers(1, &four_idx);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, four_idx);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(four_idx_buff), four_idx_buff, GL_STATIC_DRAW);
+	}
 }
 
 void make_shaderProgram()
