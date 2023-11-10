@@ -104,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,10 +130,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="14.cpp" />
+    <ClCompile Include="opengl_class\EBO.cpp" />
+    <ClCompile Include="opengl_class\Figure.cpp" />
+    <ClCompile Include="opengl_class\GL.cpp" />
+    <ClCompile Include="opengl_class\Shader.cpp" />
+    <ClCompile Include="opengl_class\Triangle.cpp" />
+    <ClCompile Include="opengl_class\VAO.cpp" />
+    <ClCompile Include="opengl_class\VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.glsl" />
-    <None Include="vertex.glsl" />
+    <ClInclude Include="EBO.h" />
+    <ClInclude Include="GL.h" />
+    <ClInclude Include="header.h" />
+    <ClInclude Include="header_user.h" />
+    <ClInclude Include="opengl_class\Figure.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Type.h" />
+    <ClInclude Include="VAO.h" />
+    <ClInclude Include="VBO.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="frequently_used_code.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="opengl_class\fragment.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,14 +13,13 @@
 #define WIDTH 800
 #define HEIGHT 600
 
-
 typedef struct Point
 {
 	float x, y;
 }Point;
 
-GLUquadricObj* qobj;
 
+GLuint vao, center_vbo, center_c_vbo, four_idx, four_list;
 
 GLchar* vertexSource, * fragmentSource; //--- 소스코드 저장 변수
 GLuint vertexShader, fragmentShader; //--- 세이더 객체
@@ -59,7 +58,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	glewInit();
 	make_shaderProgram();
 
-	//InitBuffer();
+	InitBuffer();
 
 	// 깊이 검사 설정
 	glEnable(GL_DEPTH_TEST);
@@ -70,35 +69,57 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	glutMainLoop();
 	// 깊이 
 	glDisable(GL_DEPTH_TEST);
-	gluDeleteQuadric(qobj);
+
 }
 
 /*
-모델링 변환하기
- 화면의 중앙에 x, y, z축을 그린다. 좌표계와 3차원 객체들은 모두 x, y축에 대해 같은 각도로 기울어져 있다.
- 화면의 좌, 우에 3차원 객체를 그리고, 키보드 명령으로 객체 변환 하기
- 우: 육면체
- 좌: 원뿔 (또는, 구)
- 키보드 명령
- x/X/y/Y: 객체의 x/y축에 대하여 각각 양/음 방향으로 회전하기 (두 객체가 모두 자전)
- 1/2/3: 1을 누르면 좌측의 객체만, 2를 누르면 우측의 객체만, 3을 누르면 모두 자전한다.
- r/R: 두 객체를 화면 중앙의 y축에 대하여 양/음 방향으로 회전하기 (공전)
- c: 두 도형을 다른 도형으로 바꾼다.
- s: 초기화 하기*/
+3차원 객체, 육면체 또는 사면체의 면을 명령어에 따라 그리기
+ 모든 객체들은 X축으로 10도, y축으로 10도 회전해서 그린다. (3차원 도형이라 약간 기울어지게 그린다)
+ 다음의 키보드 명령어에 따라 도형을 구성하는 각 면을 그린다. 각 면마다 색상을 정해 해당 색상으로 그린다.
+ 1/2/3/4/5/6: 육면체의 각 면을 그린다.
+ 7/8/9/0 : 사면체의 각 면을 그린다.
+ c: 육면체에서 랜덤한 2개의 면을 그린다.
+ t: 사면체에서 랜덤한 2개의 면을 그린다.
+*/
 
 GLvoid drawScene()
 {
 	glClearColor(1.0, 1.0, 1.0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	// 좌표축 그리기
+	//--- 렌더링 파이프라인에 세이더 불러오기
+	glUseProgram(shaderProgramID);
+	//--- 사용할 VAO 불러오기
+	glBindVertexArray(vao);
 
+	int PosLocation = glGetAttribLocation(shaderProgramID, "in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
+	int ColorLocation = glGetAttribLocation(shaderProgramID, "in_Color"); //	: 1
 
-	qobj = gluNewQuadric(); // 객체 생성하기
-	gluQuadricDrawStyle(qobj, GLU_LINE); // 도형 스타일
-	gluQuadricNormals(qobj, GLU_SMOOTH); // 생략 가능
-	gluQuadricOrientation(qobj, GLU_OUTSIDE); // 생략 가능
-	gluSphere(qobj, 0.3, 20, 20); // 객체 만들기
-	glutSwapBuffers();
+	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
+	glEnableVertexAttribArray(ColorLocation);
+
+	// 좌표축 그리기
+	for (int i = 0; i < 2; ++i) {
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, center_vbo); // VBO Bind
+			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(i * 6 * sizeof(float)));
+		}
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, center_c_vbo); // VBO Bind
+			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(i * 6 * sizeof(float)));
+		}
+		glDrawArrays(GL_LINES, 0, 2); // 설정대로 출력
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, four_list); // VBO Bind
+	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+
+	glDisableVertexAttribArray(PosLocation); // Disable 필수!
+	glDisableVertexAttribArray(ColorLocation);
+
+	glutSwapBuffers(); //--- 화면에 출력하기
 }
 //--- 다시그리기 콜백 함수
 GLvoid Reshape(int w, int h)
@@ -145,6 +166,66 @@ GLvoid Mouse(int button, int state, int x, int y)
 
 void InitBuffer()
 {
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	{
+		// 좌표축
+		const GLfloat center_line[6][3] = {
+			// x축
+			{-1.0, 0.0, 0.0}, {1.0, 0.0, 0.0},
+			// y축
+			{0.0, -1.0, 0.0}, {0.0, 1.0, 0.0},
+			// z축
+			{0.0, 0.0, -1.0}, {0.0, 0.0, 1.0}
+		};
+		const GLfloat center_color[6][3] = {
+			// x축
+			{1.0, 0.0, 0.0},{1.0, 0.0, 0.0},
+			// y축
+			{0.0, 1.0, 0.0},{0.0, 1.0, 0.0},
+			// z축
+			{0.0, 0.0, 1.0},{0.0, 0.0, 1.0}
+		};
+
+		glGenBuffers(1, &center_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, center_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(center_line), center_line, GL_STATIC_DRAW);
+		glGenBuffers(1, &center_c_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, center_c_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(center_color), center_color, GL_STATIC_DRAW);
+	}
+
+	{
+		// four solid
+		const GLfloat size = 0.3;
+		const GLfloat data[5][3] = {
+			// pos
+			{0.0, 0.0, 0.0},	// 0
+			{size, 0.0, 0.0},	// 1
+			{0.0,size, 0.0},	// 2
+			{0.0, 0.0, size},	// 3
+			// color
+			{0.5, 0.5, 0.0}		// 4
+		};
+
+		// index buffer
+		GLuint four_idx_buff[] = {
+			// pos
+			0, 2, 1, 0, 3, 2, 0, 1, 3, 2, 3, 1,
+			// color
+			4, 4, 4
+		};
+
+		glGenBuffers(1, &four_list);
+		glBindBuffer(GL_ARRAY_BUFFER, four_list);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+
+		glGenBuffers(1, &four_idx);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, four_idx);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(four_idx_buff), four_idx_buff, GL_STATIC_DRAW);
+	}
 }
 
 void make_shaderProgram()

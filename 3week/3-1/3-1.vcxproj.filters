@@ -13,18 +13,100 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="소스 파일\01.Shader">
+      <UniqueIdentifier>{8452680e-1d5d-415f-a927-ec0bb12018c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\02.GL">
+      <UniqueIdentifier>{cd0fdea0-38e5-4b74-9521-dee25faa0f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\03.Object">
+      <UniqueIdentifier>{c3674752-208d-4216-8225-04df81a86258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\03.Object\01.Manage">
+      <UniqueIdentifier>{1a343977-14ca-4fd5-a645-8b5188fa65ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\03.Object\02.Figure">
+      <UniqueIdentifier>{1cd6eb0e-6e5f-44dd-8bfd-2b4f884ac354}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\03.Object\02.Figure\02.Triangle">
+      <UniqueIdentifier>{dc1341df-5dae-4b83-a290-666132bb332f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\03.Object\02.Figure\01.Figure">
+      <UniqueIdentifier>{b8a2f179-7578-44eb-bca9-d01c50ca3696}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\02.GL\01.VAO">
+      <UniqueIdentifier>{1cf6fc08-cb93-4d79-b01e-59c30d610a88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\02.GL\02.VBO">
+      <UniqueIdentifier>{72fe8d13-8722-43ab-8662-f1bddfd5ddf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\02.GL\03.EBO">
+      <UniqueIdentifier>{56d66fba-d23e-4a94-b9c9-b1c328e1a1b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="14.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="opengl_class\VAO.cpp">
+      <Filter>소스 파일\02.GL\01.VAO</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_class\VBO.cpp">
+      <Filter>소스 파일\02.GL\02.VBO</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_class\Figure.cpp">
+      <Filter>소스 파일\03.Object\02.Figure\01.Figure</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_class\Triangle.cpp">
+      <Filter>소스 파일\03.Object\02.Figure\02.Triangle</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_class\EBO.cpp">
+      <Filter>소스 파일\02.GL\03.EBO</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_class\Shader.cpp">
+      <Filter>소스 파일\01.Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_class\GL.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.glsl">
+    <ClInclude Include="Type.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>소스 파일\01.Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="GL.h">
+      <Filter>소스 파일\02.GL</Filter>
+    </ClInclude>
+    <ClInclude Include="VAO.h">
+      <Filter>소스 파일\02.GL\01.VAO</Filter>
+    </ClInclude>
+    <ClInclude Include="VBO.h">
+      <Filter>소스 파일\02.GL\02.VBO</Filter>
+    </ClInclude>
+    <ClInclude Include="EBO.h">
+      <Filter>소스 파일\02.GL\03.EBO</Filter>
+    </ClInclude>
+    <ClInclude Include="header_user.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_class\Figure.h">
+      <Filter>소스 파일\03.Object\02.Figure\01.Figure</Filter>
+    </ClInclude>
+    <ClInclude Include="header.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="frequently_used_code.txt">
       <Filter>소스 파일</Filter>
-    </None>
-    <None Include="vertex.glsl">
-      <Filter>소스 파일</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="opengl_class\fragment.glsl">
+      <Filter>소스 파일\01.Shader</Filter>
     </None>
   </ItemGroup>
 </Project>
