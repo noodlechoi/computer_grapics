@@ -3,7 +3,7 @@
 
 CVAO vao;
 std::vector<CVBO> vbos;
-CShader shader("opengl_class/vertex.glsl", "opengl_class/fragment.glsl");
+CShader shader("vertex.glsl", "fragment.glsl");
 
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
