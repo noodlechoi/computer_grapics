@@ -4,8 +4,7 @@
 
 CVAO vao;
 std::vector<CVBO> vbos;
-std::vector<std::array<float, 2>> trans;
-bool is_turn;
+std::vector<std::pair<std::array<float, 2>, int>> trans;
 bool is_right;
 CRandom rand_num;
 CShader shader("vertex.glsl", "fragment.glsl");
@@ -38,6 +37,7 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	glutMouseFunc(Mouse);
 	glutKeyboardFunc(Keyboard);
 	glutTimerFunc(100, TimerFunction, 1);
+	glutTimerFunc(1000, TimerFunction, 2); // 타이머함수 재 설정
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
 
@@ -78,12 +78,13 @@ GLvoid drawScene()
 
 	// bar
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(trans[0][0], trans[0][1], 0.0f));
+	model = glm::translate(model, glm::vec3(trans[0].first[0], trans[0].first[1], 0.0f));
 	unsigned int modelLocation = shader.getUniform("transform");
 
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
 	for (int i = 0; i < 2; ++i) {
+
 		vbos[0].Bind();
 		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * i));
 		vbos[1].Bind();
@@ -96,8 +97,10 @@ GLvoid drawScene()
 
 	int trans_idx = 1;
 	for (int i = 2; i < vbos.size(); ) {
+		if (trans_idx + 1 > trans.size()) break;
+
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(trans[trans_idx].first[0], trans[trans_idx].first[1], 0.0f));
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
 		// 삼각형
@@ -123,6 +126,7 @@ GLvoid drawScene()
 		// 2개씩
 		if (i > vbos.size()) break;
 		i += 2;
+		trans_idx++;
 	}
 
 	glDisableVertexAttribArray(PosLocation); // Disable 필수!
@@ -167,53 +171,70 @@ GLvoid Mouse(int button, int state, int x, int y)
 
 void TimerFunction(int value)
 {
-	// bar 움직이기
-	for (auto& t : trans) {
-		if (!is_turn) {
-			if (t[0] >= 0.8) is_turn = true;
-			t[0] += 0.1f;
+	// 움직이는 타이머
+	if (value == 1) {
+		// bar 움직이기
+		trans[0].first[0] += 0.1f * trans[0].second;
+		if (trans[0].first[0] >= 0.8) trans[0].second = -1;
+		if (trans[0].first[0] <= -0.8) trans[0].second = 1;
+		// 날아다니는 도형 움직이기
+		for (int i = 1; i < trans.size(); ++i) {
+			trans[i].first[0] += 0.08f * trans[i].second;
+			// 무조건 아래로
+			trans[i].first[1] += 0.1f * -1;
+
+			// 바닥으로 가면 사라짐
+			if (trans[i].first[1] <= -3.0) {
+				trans.erase(trans.begin() + i);
+				vbos.erase(vbos.begin() + (2 * i));
+				vbos.erase(vbos.begin() + (2 * i + 1));
+				i--;
+			}
 		}
-		else{
-			if (t[0] <= -0.8) is_turn = false;
-			t[0] -= 0.1f;
+		glutTimerFunc(100, TimerFunction, 1); // 타이머함수 재 설정
+	}
+	// 생성 타이머
+	if (value == 2) {
+		size_t rand_type = rand_num.get(static_cast<size_t>(EShape::tri), static_cast<size_t>(EShape::rec));
+		//size_t rand_type = static_cast<size_t>(EShape::tri);
+
+		std::array<float, 2> rand_pos = { 1.0, rand_num.get(0.0f, 0.2f) };
+		std::array<float, 3> rand_color = { rand_num.get(0.0f, 0.5f) + 0.4f, rand_num.get(0.0f, 0.5f) + 0.4f, rand_num.get(0.0f, 0.5f) + 0.4f };
+
+		// 왼쪽으로 생성 위치 변경
+		if (!is_right) {
+			rand_pos[0] = -1.0f;
+			is_right = true;
 		}
-	}
+		else {
+			rand_pos[0] = 1.0f;
+			is_right = false;
+		}
 
-	size_t rand_type = rand_num.get(static_cast<size_t>(EShape::tri), static_cast<size_t>(EShape::rec));
-	//size_t rand_type = static_cast<size_t>(EShape::tri);
+		// 삼각형 생성
+		if (rand_type == static_cast<size_t>(EShape::tri)) {
+			CTriangle tri({ rand_pos[0], rand_pos[1] + 0.6}, 0.2, rand_color);
+			vbos.push_back(CVBO(tri.getPos().data(), tri.getSizeOf(), static_cast<unsigned int>(EShape::tri)));
+			vbos.push_back(CVBO(tri.getColor().data(), tri.getSizeOf(), static_cast<unsigned int>(EShape::tri)));
+		}
+		// 사각형 생성
+		else {
+			CRectangle rec({ rand_pos[0], rand_pos[1] + 0.6 }, 0.2, rand_color);
+			vbos.push_back(CVBO(rec.getPos().data(), rec.getSizeOf(), static_cast<unsigned int>(EShape::rec)));
+			vbos.push_back(CVBO(rec.getColor().data(), rec.getSizeOf(), static_cast<unsigned int>(EShape::rec)));
+		}
 
-	std::array<float, 2> rand_pos = { 1.0, rand_num.get(0.0f, 0.2f) };
-	std::array<float, 3> rand_color = { rand_num.get(0.0f, 0.5f) + 0.4f, rand_num.get(0.0f, 0.5f) + 0.4f, rand_num.get(0.0f, 0.5f) + 0.4f };
-
-	// 왼쪽으로 생성 위치 변경
-	if (!is_right) {
-		rand_pos[0] = -1.0f;
-		is_right = true;
-	}
-	else {
-		rand_pos[0] = 1.0f;
-		is_right = false;
-	}
-
-	// 삼각형
-	if (rand_type == static_cast<size_t>(EShape::tri)) {
-		CTriangle tri({ rand_pos[0], rand_pos[1] + 0.6}, 0.2, rand_color);
-		vbos.push_back(CVBO(tri.getPos().data(), tri.getSizeOf(), static_cast<unsigned int>(EShape::tri)));
-		vbos.push_back(CVBO(tri.getColor().data(), tri.getSizeOf(), static_cast<unsigned int>(EShape::tri)));
-
-		trans.push_back({ 0.0f, 0.0f });
-	}
-	// 사각형
-	else {
-		CRectangle rec({ rand_pos[0], rand_pos[1] + 0.6 }, 0.2, rand_color);
-		vbos.push_back(CVBO(rec.getPos().data(), rec.getSizeOf(), static_cast<unsigned int>(EShape::rec)));
-		vbos.push_back(CVBO(rec.getColor().data(), rec.getSizeOf(), static_cast<unsigned int>(EShape::rec)));
-
-		trans.push_back({ 0.0f, 0.0f });
+		// 오른쪽이면 왼쪽으로
+		if (rand_pos[0] == 1.0) {
+			trans.push_back({ { 0.0, 0.0 }, -1 });
+		}
+		else {
+			trans.push_back({ { 0.0, 0.0 }, 1 });
+		}
+		glutTimerFunc(1000, TimerFunction, 2); // 타이머함수 재 설정
 	}
 
 	glutPostRedisplay(); // 화면 재 출력
-	glutTimerFunc(100, TimerFunction, 1); // 타이머함수 재 설정
 }
 
 GLvoid initBuffer()
@@ -226,5 +247,5 @@ GLvoid initBuffer()
 	vbos.push_back(CVBO(bar.getPos().data(), bar.getSizeOf(), static_cast<unsigned int>(EShape::rec)));
 	vbos.push_back(CVBO(bar.getColor().data(), bar.getSizeOf(), static_cast<unsigned int>(EShape::rec)));
 
-	trans.push_back({ 0.0, 0.0 });
+	trans.push_back({ { 0.0, 0.0 }, 1 });
 }
