@@ -1,52 +1,31 @@
 #include "Figure.h"
 
-CFigure::CFigure()
+CFigure::CFigure() : pivot{0.0}, color{0.0, 0.0, 0.0}, size{1.0}
 {
 
 }
 
-CFigure::CFigure(const GLfloat** const (pos), const GLfloat** const (color))
-{
-	glGenBuffers(1, &this->m_pos_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_pos_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(pos), pos, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &this->m_color_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_color_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+CFigure::CFigure(const float& pivot, const float& size, const std::array<float, 3>& color) : pivot{pivot}, size{size}, color{color}
+{
 }
 
 CFigure::~CFigure()
 {
 }
 
-void CFigure::initVAO(GLuint& vao)
+float CFigure::getPivot() const
 {
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	return this->pivot;
 }
 
-void CFigure::initVBO(const void* (pos), const void* (color))
+float CFigure::getSize() const
 {
-	glGenBuffers(1, &this->m_pos_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_pos_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(pos), pos, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &this->m_color_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_color_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+	return this->size;
 }
 
-void CFigure::draw(GLuint pos_location, GLuint color_location)
+std::array<float, 3> CFigure::getColor() const
 {
-	// pos vbo 바인딩
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_pos_vbo); // VBO Bind
-	glVertexAttribPointer(pos_location, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-	// color vbo 바인딩
-	glBindBuffer(GL_ARRAY_BUFFER, this->m_color_vbo); // VBO Bind
-	glVertexAttribPointer(color_location, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-	// 우선 라인을 그린다.
-	glDrawArrays(GL_LINES, 0, 2);
+	return this->color;
 }
+

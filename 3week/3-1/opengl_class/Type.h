@@ -1,4 +1,6 @@
 #pragma once
+#define PI 3.141592
+#define toRadian(degree) degree * (PI / 180)
 
 typedef struct Point
 {

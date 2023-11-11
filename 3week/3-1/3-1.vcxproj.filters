@@ -43,6 +43,9 @@
     <Filter Include="소스 파일\02.GL\03.EBO">
       <UniqueIdentifier>{56d66fba-d23e-4a94-b9c9-b1c328e1a1b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\03.Object\02.Figure\03. Rectangle">
+      <UniqueIdentifier>{0dae5fa7-d938-49e6-803d-3ca0313d1e31}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="14.cpp">
@@ -71,9 +74,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Type.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>소스 파일\01.Shader</Filter>
     </ClInclude>
@@ -86,16 +86,22 @@
     <ClInclude Include="VBO.h">
       <Filter>소스 파일\02.GL\02.VBO</Filter>
     </ClInclude>
-    <ClInclude Include="EBO.h">
-      <Filter>소스 파일\02.GL\03.EBO</Filter>
-    </ClInclude>
-    <ClInclude Include="header_user.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="opengl_class\Figure.h">
       <Filter>소스 파일\03.Object\02.Figure\01.Figure</Filter>
     </ClInclude>
     <ClInclude Include="header.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_class\Type.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_class\header_user.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_class\Triangle.h">
+      <Filter>소스 파일\03.Object\02.Figure\02.Triangle</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -108,5 +114,10 @@
     <None Include="opengl_class\fragment.glsl">
       <Filter>소스 파일\01.Shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="3-1.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

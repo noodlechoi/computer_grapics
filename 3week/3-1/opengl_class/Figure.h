@@ -1,22 +1,22 @@
 #pragma once
 #include "header.h"
+#include <array>
 
-// 모든 도형들의 기초 클래스
+// 모든 도형들의 추상 클래스
 class CFigure
 {
-private:
-	GLuint m_pos_vbo;
-	GLuint m_color_vbo;
+protected:
+	// 중점, 가로 세로 사이즈, 색깔(한가지 색상만)
+	float pivot;
+	float size;
+	std::array<float, 3> color;
 public:
 	CFigure();
-	CFigure(const GLfloat** const (pos), const GLfloat** const (color));
-	~CFigure();
+	CFigure(const float& pivot, const float& size, const std::array<float, 3>& color);
+	virtual ~CFigure();
 public:
-	// VAO 생성 및 바인딩, 인자 : vao 변수
-	void initVAO(GLuint& vao);
-	// VBO 바인딩
-	void initVBO(const void* (pos), const void* (color));
-	// line을 그림
-	virtual void draw(GLuint pos_location, GLuint color_location);
+	virtual float getPivot() const;
+	float getSize() const;
+	std::array<float, 3> getColor() const;
 };
 

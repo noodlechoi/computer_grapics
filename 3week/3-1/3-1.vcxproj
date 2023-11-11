@@ -139,13 +139,14 @@
     <ClCompile Include="opengl_class\VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EBO.h" />
     <ClInclude Include="GL.h" />
     <ClInclude Include="header.h" />
-    <ClInclude Include="header_user.h" />
     <ClInclude Include="opengl_class\Figure.h" />
+    <ClInclude Include="opengl_class\header_user.h" />
+    <ClInclude Include="opengl_class\Triangle.h" />
+    <ClInclude Include="opengl_class\Type.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="Type.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
   </ItemGroup>
@@ -154,6 +155,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="opengl_class\fragment.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="3-1.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
