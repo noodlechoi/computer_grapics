@@ -29,3 +29,10 @@ std::array<float, 3> CFigure::getColor() const
 	return this->color;
 }
 
+void CFigure::set(const float& pivot, const float& size, const std::array<float, 3>& color)
+{
+	this->pivot = pivot;
+	this->size = size;
+	this->color = color;
+}
+

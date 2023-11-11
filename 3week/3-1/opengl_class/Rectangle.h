@@ -1,19 +1,19 @@
 #pragma once
-#include "Figure.h"
+#include "Triangle.h"
 
-class CRectangle : public CFigure
+// 삼각형 2개가 있는 사각형 객체
+class CRectangle
 {
 protected:
-	
+	std::array<CTriangle, 2> tris;
 	std::pair<float, float> sizes;
-	std::array<std::array<float, 3>, 4> colors;
 public:
 	CRectangle();
 	CRectangle(const float& pivot, const float& size, const std::array<float, 3>& color);
 	~CRectangle();
 public:
-	std::array<std::array<float, 3>, 4> getPos() const;
+	std::array<std::array<float, 3>, 6> getPos() const;
 	unsigned int getSizeOf() const;
-	std::array<std::array<float, 3>, 4> getColor() const;
+	std::array<std::array<float, 3>, 6> getColor() const;
 };
 

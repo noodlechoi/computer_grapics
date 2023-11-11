@@ -18,5 +18,6 @@ public:
 	virtual float getPivot() const;
 	float getSize() const;
 	std::array<float, 3> getColor() const;
+	virtual void set(const float& pivot, const float& size, const std::array<float, 3>& color);
 };
 

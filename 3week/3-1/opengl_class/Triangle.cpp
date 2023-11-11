@@ -41,3 +41,12 @@ std::array<std::array<float, 3>, 3> CTriangle::getColor() const
 {
 	return this->colors;
 }
+
+void CTriangle::set(const float& pivot, const float& size, const std::array<float, 3>& color)
+{
+	CFigure::set(pivot, size, color);
+
+	for (int i = 0; i < 3; ++i) {
+		this->colors[i] = { color[0],  color[1], color[2] };
+	}
+}

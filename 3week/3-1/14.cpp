@@ -68,20 +68,36 @@ GLvoid drawScene()
 
 	glDrawArrays(GL_LINES, 0, 2); // 설정대로 출력
 
-	vbos[2].Bind();
-	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	vbos[3].Bind();
-	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//vbos[2].Bind();
+	//glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//vbos[3].Bind();
+	//glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	vbos[4].Bind();
-	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	vbos[5].Bind();
-	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	for (int i = 0; i < 2; ++i) {
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+		vbos[4].Bind();
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * i));
+		vbos[5].Bind();
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * i));
 
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+
+	//vbos[4].Bind();
+	//glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//vbos[5].Bind();
+	//glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	//vbos[4].Bind();
+
+	//glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9));
+	//vbos[5].Bind();
+	//glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9));
+
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	glDisableVertexAttribArray(PosLocation); // Disable 필수!
 	glDisableVertexAttribArray(ColorLocation);
@@ -144,13 +160,7 @@ GLvoid initBuffer()
 	vbos.push_back(CVBO(tri.getPos().data(), tri.getSizeOf()));
 	vbos.push_back(CVBO(tri.getColor().data(), tri.getSizeOf()));
 
-	const CRectangle rec(0.0, 0.3, { 1.0, 0.0, 1.0 });
+	const CRectangle rec(0.0, 0.2, { 1.0, 1.0, 0.0 });
 	vbos.push_back(CVBO(rec.getPos().data(), rec.getSizeOf()));
 	vbos.push_back(CVBO(rec.getColor().data(), rec.getSizeOf()));
-
-	//const GLuint index[] = {
-	//	0, 1, 3, 0, 2, 3
-	//};
-	//ebos.push_back(CEBO(index, 6));
-
 }

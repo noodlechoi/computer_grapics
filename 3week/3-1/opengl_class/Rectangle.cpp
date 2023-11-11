@@ -1,41 +1,66 @@
 #include "Rectangle.h"
 
-CRectangle::CRectangle() : CFigure()
+CRectangle::CRectangle()
 {
 }
 
-CRectangle::CRectangle(const float& pivot, const float& size, const std::array<float, 3>& color) : CFigure(pivot, size, color), sizes{size, size}
+CRectangle::CRectangle(const float& pivot, const float& size, const std::array<float, 3>& color) : sizes{size, size}
 {
-	// 각 꼭짓점에 동일한 색상 넣기
-	for (int i = 0; i < 4; ++i) {
-		this->colors[i] = { color[0],  color[1], color[2] };
-	}
+	tris[0].set(pivot, size, color);
+	tris[1].set(pivot, size, color);
 }
 
 CRectangle::~CRectangle()
 {
 }
 
-std::array<std::array<float, 3>, 4> CRectangle::getPos() const
+std::array<std::array<float, 3>, 6> CRectangle::getPos() const
 {
 	float w = sizes.first / 2;
 	float h = sizes.second / 2;
 
-	// LT, LB, RB, RT
+	float p = tris[0].getPivot();
+
+	// LT, LB, RB, LB, RB, RT
 	return {
-		pivot - w, pivot + h, 1.0,
-		pivot - w, pivot - h, 1.0,
-		pivot + w, pivot - h, 1.0,
-		pivot + w, pivot + h, 1.0,
+		p - w, p + h, 1.0,
+		p - w, p - h, 1.0,
+		p + w, p + h, 1.0,
+		p - w, p - h, 1.0,
+		p + w, p - h, 1.0,
+		p + w, p + h, 1.0,
 	};
 }
 
 unsigned int CRectangle::getSizeOf() const
 {
-	return sizeof(float) * 4;
+	return sizeof(float) * 3 * 6;
 }
 
-std::array<std::array<float, 3>, 4> CRectangle::getColor() const
+std::array<std::array<float, 3>, 6> CRectangle::getColor() const
 {
-	return this->colors;
+	const std::array<std::array<float, 3>, 3> color0 = tris[0].getColor();
+	const std::array<std::array<float, 3>, 3> color1 = tris[1].getColor();
+
+	return {
+		color0[0][0],
+		color0[0][1],
+		color0[0][2],
+		color0[1][0],
+		color0[1][1],
+		color0[1][2],
+		color0[2][0],
+		color0[2][1],
+		color0[2][2],
+
+		color1[0][0],
+		color1[0][1],
+		color1[0][2],
+		color1[1][0],
+		color1[1][1],
+		color1[1][2],
+		color1[2][0],
+		color1[2][1],
+		color1[2][2],
+	};
 }
