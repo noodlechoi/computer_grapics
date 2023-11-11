@@ -75,11 +75,11 @@
     <ClCompile Include="opengl_class\Rectangle.cpp">
       <Filter>소스 파일\03.Object\02.Figure\03. Rectangle</Filter>
     </ClCompile>
+    <ClCompile Include="opengl_class\Tanslate.cpp">
+      <Filter>소스 파일\01.Shader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Shader.h">
-      <Filter>소스 파일\01.Shader</Filter>
-    </ClInclude>
     <ClInclude Include="GL.h">
       <Filter>소스 파일\02.GL</Filter>
     </ClInclude>
@@ -110,6 +110,12 @@
     <ClInclude Include="opengl_class\Rectangle.h">
       <Filter>소스 파일\03.Object\02.Figure\03. Rectangle</Filter>
     </ClInclude>
+    <ClInclude Include="opengl_class\Shader.h">
+      <Filter>소스 파일\01.Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_class\Tanslate.h">
+      <Filter>소스 파일\01.Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="frequently_used_code.txt">
@@ -118,6 +124,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="opengl_class\fragment.glsl">
+      <Filter>소스 파일\01.Shader</Filter>
+    </None>
+    <None Include="vertex.glsl">
       <Filter>소스 파일\01.Shader</Filter>
     </None>
   </ItemGroup>

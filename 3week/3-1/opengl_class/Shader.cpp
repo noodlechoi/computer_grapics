@@ -26,6 +26,11 @@ int CShader::getLocation(std::string_view name)
 	return glGetAttribLocation(this->shaderID, name.data());
 }
 
+unsigned int CShader::getUniform(std::string_view name)
+{
+	return glGetUniformLocation(this->shaderID, name.data());
+}
+
 void CShader::useShader()
 {
 	glUseProgram(this->shaderID);

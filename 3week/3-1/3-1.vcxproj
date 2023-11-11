@@ -135,6 +135,7 @@
     <ClCompile Include="opengl_class\GL.cpp" />
     <ClCompile Include="opengl_class\Rectangle.cpp" />
     <ClCompile Include="opengl_class\Shader.cpp" />
+    <ClCompile Include="opengl_class\Tanslate.cpp" />
     <ClCompile Include="opengl_class\Triangle.cpp" />
     <ClCompile Include="opengl_class\VAO.cpp" />
     <ClCompile Include="opengl_class\VBO.cpp" />
@@ -145,10 +146,11 @@
     <ClInclude Include="opengl_class\Figure.h" />
     <ClInclude Include="opengl_class\header_user.h" />
     <ClInclude Include="opengl_class\Rectangle.h" />
+    <ClInclude Include="opengl_class\Shader.h" />
+    <ClInclude Include="opengl_class\Tanslate.h" />
     <ClInclude Include="opengl_class\Triangle.h" />
     <ClInclude Include="opengl_class\Type.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
   </ItemGroup>
@@ -157,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="opengl_class\fragment.glsl" />
+    <None Include="vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="3-1.rc" />

@@ -19,14 +19,11 @@ public:
 	unsigned int getID();
 	// vec 이름 넣기
 	int getLocation(std::string_view name);
+	unsigned int getUniform(std::string_view name);
 	void useShader();
 	void makeShaderProgram();
 	void makeVertexShaders();
 	void makeFragmentShaders();
 	char* filetobuf(const char* file);
-	void set(const std::string_view name, bool value) const;
-	void set(const std::string_view name, int value) const;
-	void set(const std::string_view name, float value) const;
-
 };
 

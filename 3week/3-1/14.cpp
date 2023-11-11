@@ -60,44 +60,37 @@ GLvoid drawScene()
 	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
 	glEnableVertexAttribArray(ColorLocation);
 
-	// 좌표축 그리기
-	vbos[0].Bind();
+	//// 좌표축 그리기
+	//vbos[0].Bind();
+	//glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//vbos[1].Bind();
+	//glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	//glDrawArrays(GL_LINES, 0, 2); // 설정대로 출력
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.5f, -0.5f, 0.0f));
+	unsigned int modelLocation = shader.getUniform("transform");
+
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+	vbos[2].Bind();
 	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	vbos[1].Bind();
+	vbos[3].Bind();
 	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
-	glDrawArrays(GL_LINES, 0, 2); // 설정대로 출력
+	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	//vbos[2].Bind();
-	//glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	//vbos[3].Bind();
-	//glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	//for (int i = 0; i < 2; ++i) {
 
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	//	vbos[4].Bind();
+	//	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * i));
+	//	vbos[5].Bind();
+	//	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * i));
 
-	for (int i = 0; i < 2; ++i) {
+	//	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//}
 
-		vbos[4].Bind();
-		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * i));
-		vbos[5].Bind();
-		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * i));
-
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-	}
-
-	//vbos[4].Bind();
-	//glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	//vbos[5].Bind();
-	//glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	//vbos[4].Bind();
-
-	//glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9));
-	//vbos[5].Bind();
-	//glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9));
-
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	glDisableVertexAttribArray(PosLocation); // Disable 필수!
 	glDisableVertexAttribArray(ColorLocation);

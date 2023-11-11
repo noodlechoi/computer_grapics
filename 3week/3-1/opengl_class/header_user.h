@@ -9,3 +9,4 @@
 #include "Figure.h"
 #include "Triangle.h"
 #include "Rectangle.h"
+#include "Tanslate.h"
