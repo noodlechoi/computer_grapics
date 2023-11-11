@@ -3,6 +3,7 @@
 
 CVAO vao;
 std::vector<CVBO> vbos;
+std::vector<CEBO> ebos;
 CShader shader("vertex.glsl", "fragment.glsl");
 
 GLvoid drawScene();
@@ -81,6 +82,7 @@ GLvoid drawScene()
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
+
 	glDisableVertexAttribArray(PosLocation); // Disable 필수!
 	glDisableVertexAttribArray(ColorLocation);
 
@@ -145,4 +147,10 @@ GLvoid initBuffer()
 	const CRectangle rec(0.0, 0.3, { 1.0, 0.0, 1.0 });
 	vbos.push_back(CVBO(rec.getPos().data(), rec.getSizeOf()));
 	vbos.push_back(CVBO(rec.getColor().data(), rec.getSizeOf()));
+
+	//const GLuint index[] = {
+	//	0, 1, 3, 0, 2, 3
+	//};
+	//ebos.push_back(CEBO(index, 6));
+
 }

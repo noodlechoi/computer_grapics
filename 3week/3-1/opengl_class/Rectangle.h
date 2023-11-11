@@ -4,15 +4,16 @@
 class CRectangle : public CFigure
 {
 protected:
+	
 	std::pair<float, float> sizes;
-	std::array<std::array<float, 4>, 3> colors;
+	std::array<std::array<float, 3>, 4> colors;
 public:
 	CRectangle();
 	CRectangle(const float& pivot, const float& size, const std::array<float, 3>& color);
 	~CRectangle();
 public:
-	std::array<std::array<float, 4>, 3> getPos() const;
+	std::array<std::array<float, 3>, 4> getPos() const;
 	unsigned int getSizeOf() const;
-	std::array<std::array<float, 4>, 3> getColor() const;
+	std::array<std::array<float, 3>, 4> getColor() const;
 };
 

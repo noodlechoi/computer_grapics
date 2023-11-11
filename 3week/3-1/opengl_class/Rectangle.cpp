@@ -16,7 +16,7 @@ CRectangle::~CRectangle()
 {
 }
 
-std::array<std::array<float, 4>, 3> CRectangle::getPos() const
+std::array<std::array<float, 3>, 4> CRectangle::getPos() const
 {
 	float w = sizes.first / 2;
 	float h = sizes.second / 2;
@@ -35,7 +35,7 @@ unsigned int CRectangle::getSizeOf() const
 	return sizeof(float) * 4;
 }
 
-std::array<std::array<float, 4>, 3> CRectangle::getColor() const
+std::array<std::array<float, 3>, 4> CRectangle::getColor() const
 {
 	return this->colors;
 }
