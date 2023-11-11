@@ -74,6 +74,13 @@ GLvoid drawScene()
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
+	vbos[4].Bind();
+	glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	vbos[5].Bind();
+	glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
 	glDisableVertexAttribArray(PosLocation); // Disable 필수!
 	glDisableVertexAttribArray(ColorLocation);
 
@@ -134,4 +141,8 @@ GLvoid initBuffer()
 	const CTriangle tri(0.0, 0.2, { 1.0, 1.0, 0.0 });
 	vbos.push_back(CVBO(tri.getPos().data(), tri.getSizeOf()));
 	vbos.push_back(CVBO(tri.getColor().data(), tri.getSizeOf()));
+
+	const CRectangle rec(0.0, 0.3, { 1.0, 0.0, 1.0 });
+	vbos.push_back(CVBO(rec.getPos().data(), rec.getSizeOf()));
+	vbos.push_back(CVBO(rec.getColor().data(), rec.getSizeOf()));
 }

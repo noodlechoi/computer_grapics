@@ -72,6 +72,9 @@
     <ClCompile Include="opengl_class\GL.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="opengl_class\Rectangle.cpp">
+      <Filter>소스 파일\03.Object\02.Figure\03. Rectangle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -103,6 +106,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="opengl_class\Rectangle.h">
+      <Filter>소스 파일\03.Object\02.Figure\03. Rectangle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

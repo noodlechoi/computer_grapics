@@ -133,6 +133,7 @@
     <ClCompile Include="opengl_class\EBO.cpp" />
     <ClCompile Include="opengl_class\Figure.cpp" />
     <ClCompile Include="opengl_class\GL.cpp" />
+    <ClCompile Include="opengl_class\Rectangle.cpp" />
     <ClCompile Include="opengl_class\Shader.cpp" />
     <ClCompile Include="opengl_class\Triangle.cpp" />
     <ClCompile Include="opengl_class\VAO.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="header.h" />
     <ClInclude Include="opengl_class\Figure.h" />
     <ClInclude Include="opengl_class\header_user.h" />
+    <ClInclude Include="opengl_class\Rectangle.h" />
     <ClInclude Include="opengl_class\Triangle.h" />
     <ClInclude Include="opengl_class\Type.h" />
     <ClInclude Include="resource.h" />

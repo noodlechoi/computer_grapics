@@ -8,3 +8,4 @@
 #include "Shader.h"
 #include "Figure.h"
 #include "Triangle.h"
+#include "Rectangle.h"
