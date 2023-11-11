@@ -5,7 +5,13 @@
 CVAO vao;
 std::vector<CVBO> vbos;
 std::vector<std::pair<std::array<float, 2>, int>> trans;
+int speed = 100;
 bool is_right;
+bool is_click;
+bool flag_l;
+CVBO line_pos, line_color;
+float pos[2][3] = { 0.0, 0.0, 1.0, 0.0, 0.0, 1.0 };
+const float color[2][3] = { {1.0, }, {1.0, } };
 CRandom rand_num;
 CShader shader("vertex.glsl", "fragment.glsl");
 
@@ -21,6 +27,7 @@ Point ConvertPoint(const int& x, const int& y, const int& window_width, const in
 GLvoid drawScene();
 GLvoid Reshape(int w, int h);
 GLvoid Mouse(int button, int state, int x, int y);
+GLvoid Motion(int x, int y);
 GLvoid Keyboard(unsigned char key, int x, int y);
 void TimerFunction(int value);
 GLvoid initBuffer();
@@ -35,8 +42,9 @@ void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설�
 	// 루프 (콜백함수)
 	glutDisplayFunc(drawScene);
 	glutMouseFunc(Mouse);
+	glutMotionFunc(Motion);
 	glutKeyboardFunc(Keyboard);
-	glutTimerFunc(100, TimerFunction, 1);
+	glutTimerFunc(speed, TimerFunction, 1);
 	glutTimerFunc(1000, TimerFunction, 2); // 타이머함수 재 설정
 	glutReshapeFunc(Reshape);
 	glutMainLoop();
@@ -65,6 +73,11 @@ GLvoid Reshape(int w, int h)
 
 GLvoid drawScene()
 {
+	if (flag_l)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	glClearColor(1.0, 1.0, 1.0, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//--- 사용할 VAO 불러오기
@@ -75,11 +88,23 @@ GLvoid drawScene()
 	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
 	glEnableVertexAttribArray(ColorLocation);
 
+	// line
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+	unsigned int modelLocation = shader.getUniform("transform");
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+	if (is_click) {
+		line_pos.Bind();
+		glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+		line_color.Bind();
+		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+		line_pos.draw();
+	}
 
 	// bar
-	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(trans[0].first[0], trans[0].first[1], 0.0f));
-	unsigned int modelLocation = shader.getUniform("transform");
 
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -109,11 +134,10 @@ GLvoid drawScene()
 			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 			vbos[i + 1].Bind();
 			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
 			vbos[i].draw();
 		}
 		// 사각형
-		else {
+		else{
 			for (int j = 0; j < 2; ++j) {
 				vbos[i].Bind();
 				glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * j));
@@ -145,12 +169,19 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 	switch (key) {
 	case 'l':
 	case 'L':
+		flag_l = !flag_l;
 		break;
 	case 'p':
 		break;
 	case '+':
+		if (speed - 5> 10) {
+			speed -= 5;
+		}
 		break;
 	case '-':
+		if (speed < 5000) {
+			speed += 5;
+		}
 		break;
 	case 'q':
 		exit(0);
@@ -160,13 +191,37 @@ GLvoid Keyboard(unsigned char key, int x, int y)
 	}
 }
 
+GLvoid Motion(int x, int y)
+{
+	if (is_click) {
+		Point p = ConvertPoint(x, y, WIDTH, HEIGHT);
+		pos[1][0] = p.x;
+		pos[1][1] = p.y;
+		line_pos.Gen(pos, sizeof(pos), static_cast<unsigned int>(EShape::line));
+
+		
+
+		glutPostRedisplay();
+	}
+}
+
 GLvoid Mouse(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
 		Point p = ConvertPoint(x, y, WIDTH, HEIGHT);
 		std::cout << p.x << " " << p.y << std::endl;
-	}
+		pos[0][0] = p.x;
+		pos[0][1] = p.y;
+		pos[1][0] = p.x;
+		pos[1][1] = p.y;
+		line_pos.Gen(pos, sizeof(pos), static_cast<unsigned int>(EShape::line));
+		line_color.Gen(color, sizeof(color), static_cast<unsigned int>(EShape::line));
 
+		is_click = true;
+	}
+	else if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		is_click = false;
+	}
 }
 
 void TimerFunction(int value)
@@ -184,14 +239,14 @@ void TimerFunction(int value)
 			trans[i].first[1] += 0.1f * -1;
 
 			// 바닥으로 가면 사라짐
-			if (trans[i].first[1] <= -3.0) {
+			if (trans[i].first[1] <= -3.0f) {
 				trans.erase(trans.begin() + i);
 				vbos.erase(vbos.begin() + (2 * i));
 				vbos.erase(vbos.begin() + (2 * i + 1));
-				i--;
+				if(trans.size() >= 3) i--;
 			}
 		}
-		glutTimerFunc(100, TimerFunction, 1); // 타이머함수 재 설정
+		glutTimerFunc(speed, TimerFunction, 1); // 타이머함수 재 설정
 	}
 	// 생성 타이머
 	if (value == 2) {
