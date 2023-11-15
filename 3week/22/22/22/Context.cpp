@@ -7,18 +7,75 @@ CContext::CContext()
 
 CContext::~CContext()
 {
+    if (m_program) {
+        delete m_program;
+    }
+    if (m_vao) {
+        delete m_vao;
+    }
+    if (m_vertexbuffer) {
+        delete m_vertexbuffer;
+    }
+    if (m_indexbuffer) {
+        delete m_indexbuffer;
+    }
+
+}
+
+
+void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
+{
+    switch (key) {
+    case 'o':
+
+        break;
+    default:
+        break;
+    }
+}
+
+void CContext::Mouse(const int& button, const int& state, const int& x, const int& y)
+{
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        m_prev_mousePos = CGL::GetInstance()->ConvertPoint(x, y);
+        m_camera_control = true;
+    }
+    else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
+        m_camera_control = false;
+    }
+}
+
+void CContext::Motion(const int& x, const int& y)
+{
+    if (!m_camera_control) return;
+
+    auto pos = CGL::GetInstance()->ConvertPoint(x, y);
+    auto deltaPos = pos - m_prev_mousePos;
+
+    const float cameraRotSpeed = 3.0f;
+    m_camera_yaw += deltaPos.x * cameraRotSpeed;
+    m_camera_pitch -= deltaPos.y * cameraRotSpeed;
+
+    if (m_camera_yaw < 0.0f)   m_camera_yaw += 360.0f;
+    if (m_camera_yaw > 360.0f) m_camera_yaw -= 360.0f;
+
+    if (m_camera_pitch > 89.0f)  m_camera_pitch = 89.0f;
+    if (m_camera_pitch < -89.0f) m_camera_pitch = -89.0f;
+
+    m_prev_mousePos = pos;
+
 }
 
 void CContext::Render()
 {
     m_program->UseShader();
 
-    m_camera_front = glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_yaw), glm::vec3(0.0f, 1.0f, 0.0f)) 
-        * glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_pitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
+    m_camera_front = glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_yaw), glm::vec3(0.0f, 1.0f, 0.0f)) * 
+        glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_pitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
         glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
 
-    auto projection = glm::perspective(glm::radians(45.0f),
-        (float)WIDTH / (float)HEIGHT, 0.01f, 20.0f);
+    auto projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 20.0f);
+
     auto view = glm::lookAt(
         m_camera_pos,
         m_camera_pos + m_camera_front,

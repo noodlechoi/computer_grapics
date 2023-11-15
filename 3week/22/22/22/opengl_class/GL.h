@@ -18,5 +18,5 @@ public:
 	// name : window name
 	void InitWindow(int argc, char** argv, const int& x, const int& y, std::string_view name);
 	void Render(void (*funcptr)(void));
-	Point ConvertPoint(const int& x, const int& y);
+	glm::vec2 ConvertPoint(const int& x, const int& y);
 };

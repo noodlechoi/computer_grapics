@@ -10,6 +10,21 @@ void DrawScene()
 	glutSwapBuffers();
 }
 
+void KeyBoard(unsigned char key, int x, int y)
+{
+	context.KeyBoard(key, x, y);
+}
+
+void Mouse(int button, int state, int x, int y)
+{
+	context.Mouse(button, state, x, y);
+}
+
+void Motion(int x, int y)
+{
+	context.Motion(x, y);
+}
+
 int main(int argc, char** argv)
 {
 	CGL::GetInstance()->InitWindow(argc, argv, WIDTH, HEIGHT, "Ω«Ω¿ 22");
@@ -24,6 +39,9 @@ int main(int argc, char** argv)
 
 		glutPostRedisplay();
 		context.Update();
+		glutKeyboardFunc(KeyBoard);
+		glutMouseFunc(Mouse);
+		glutMotionFunc(Motion);
 		glutMainLoop();
 	}
 	// ±Ì¿Ã 

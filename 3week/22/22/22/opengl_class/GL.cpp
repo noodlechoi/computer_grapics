@@ -47,9 +47,9 @@ void CGL::Render(void (*funcptr)(void))
 }
 
 
-Point CGL::ConvertPoint(const int& x, const int& y)
+glm::vec2  CGL::ConvertPoint(const int& x, const int& y)
 {
-	Point tmp;
+	glm::vec2 tmp;
 	tmp.x = (double)((x - (double)WIDTH / 2.0) * (double)(1.0 / (double)(WIDTH / 2.0)));
 	tmp.y = -(double)((y - (double)HEIGHT / 2.0) * (double)(1.0 / (double)(HEIGHT / 2.0)));
 
