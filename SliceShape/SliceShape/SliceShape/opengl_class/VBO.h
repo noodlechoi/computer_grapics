@@ -17,7 +17,7 @@ public:
 	void Bind() const;
 	void Unbind() const;
 	void Delete() const;
-	void draw() const;
-	unsigned int getType();
+	void Draw() const;
+	unsigned int GetType();
 };
 

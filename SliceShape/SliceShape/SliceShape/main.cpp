@@ -34,9 +34,9 @@ GLvoid initBuffer();
 
 void main(int argc, char** argv) //--- 윈도우 출력하고 콜백함수 설정
 {
-	CGL::GetInstance()->initWindow(argc, argv, WIDTH, HEIGHT, "SliceShape");
+	CGL::GetInstance()->InitWindow(argc, argv, WIDTH, HEIGHT, "SliceShape");
 
-	shader.makeShaderProgram();
+	shader.MakeShaderProgram();
 	initBuffer();
 
 	// 루프 (콜백함수)
@@ -83,15 +83,15 @@ GLvoid drawScene()
 	//--- 사용할 VAO 불러오기
 	vao.Bind();
 
-	int PosLocation = shader.getLocation("in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
-	int ColorLocation = shader.getLocation("in_Color"); //	: 1
+	int PosLocation = shader.GetLocation("in_Position"); //	: 0  Shader의 'layout (location = 0)' 부분
+	int ColorLocation = shader.GetLocation("in_Color"); //	: 1
 	glEnableVertexAttribArray(PosLocation); // Enable 필수! 사용하겠단 의미
 	glEnableVertexAttribArray(ColorLocation);
 
 	// line
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-	unsigned int modelLocation = shader.getUniform("transform");
+	unsigned int modelLocation = shader.GetUniform("transform");
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 	if (is_click) {
 		line_pos.Bind();
@@ -99,7 +99,7 @@ GLvoid drawScene()
 		line_color.Bind();
 		glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 
-		line_pos.draw();
+		line_pos.Draw();
 	}
 
 	// bar
@@ -129,12 +129,12 @@ GLvoid drawScene()
 		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
 		// 삼각형
-		if (vbos[i].getType() == static_cast<unsigned int>(EShape::tri)) {
+		if (vbos[i].GetType() == static_cast<unsigned int>(EShape::tri)) {
 			vbos[i].Bind();
 			glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 			vbos[i + 1].Bind();
 			glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-			vbos[i].draw();
+			vbos[i].Draw();
 		}
 		// 사각형
 		else{
@@ -143,7 +143,7 @@ GLvoid drawScene()
 				glVertexAttribPointer(PosLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * j));
 				vbos[i + 1].Bind();
 				glVertexAttribPointer(ColorLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(sizeof(float) * 9 * j));
-				vbos[i].draw();
+				vbos[i].Draw();
 			}
 		}
 

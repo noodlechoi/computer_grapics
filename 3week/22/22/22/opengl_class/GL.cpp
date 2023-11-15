@@ -1,6 +1,12 @@
 #include "GL.h"
 #include "header.h"
 
+
+void Reshape(int w, int h)
+{
+	glViewport(0, 0, w, h);
+}
+
 CGL::CGL()
 {
 	// initWindow에서 생성
@@ -32,3 +38,20 @@ void CGL::InitWindow(int argc, char** argv, const int& x, const int& y, std::str
 		std::cout << "glew 초기화 성공 " << std::endl;
 }
 
+
+void CGL::Render(void (*funcptr)(void))
+{
+	::glutDisplayFunc(funcptr);
+	::glutReshapeFunc(Reshape);
+
+}
+
+
+Point CGL::ConvertPoint(const int& x, const int& y)
+{
+	Point tmp;
+	tmp.x = (double)((x - (double)WIDTH / 2.0) * (double)(1.0 / (double)(WIDTH / 2.0)));
+	tmp.y = -(double)((y - (double)HEIGHT / 2.0) * (double)(1.0 / (double)(HEIGHT / 2.0)));
+
+	return tmp;
+}

@@ -49,7 +49,7 @@ void CVBO::Delete() const
 	glDeleteVertexArrays(1, &this->m_ID);
 }
 
-void CVBO::draw() const
+void CVBO::Draw() const
 {
 	switch (m_type)	{
 	case static_cast<unsigned int>(EShape::dot):
@@ -71,7 +71,7 @@ void CVBO::draw() const
 	}
 }
 
-unsigned int CVBO::getType()
+unsigned int CVBO::GetType()
 {
 	return this->m_type;
 }

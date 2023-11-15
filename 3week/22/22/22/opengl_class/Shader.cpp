@@ -1,39 +1,52 @@
 #include "Shader.h"
 
-
-CShader::CShader() : shaderID{}
+CShader::CShader() : m_program{}
 {
 
 }
 
-CShader::CShader(std::string vertex, std::string frag) : vertex_file{vertex}, frag_file{ frag }, shaderID{}
+CShader::CShader(std::string vertex, std::string frag) : vertex_file{vertex}, frag_file{ frag }, m_program{}
 {
 
 }
 
 CShader::~CShader()
 {
-
+	if (m_program) {
+		glDeleteProgram(m_program);
+	}
 }
 
-GLuint CShader::GetID()
+GLuint CShader::GetID() const
 {
-	return shaderID;
+	return m_program;
 }
 
-int CShader::GetLocation(std::string_view name)
+void CShader::EnableLocation(const std::string_view name) const
 {
-	return glGetAttribLocation(this->shaderID, name.data());
+	glEnableVertexAttribArray(glGetAttribLocation(m_program, name.data()));
 }
 
-unsigned int CShader::GetUniform(std::string_view name)
+void CShader::DisableLocation(const std::string_view name) const
 {
-	return glGetUniformLocation(this->shaderID, name.data());
+	glDisableVertexAttribArray(glGetAttribLocation(m_program, name.data())); // Disable 필수!
 }
 
-void CShader::UseShader()
+void CShader::SetUniform(const std::string_view name, int value) const
 {
-	glUseProgram(this->shaderID);
+	auto loc = glGetUniformLocation(m_program, name.data());
+	glUniform1i(loc, value);
+}
+
+void CShader::SetUniform(const std::string_view name, const glm::mat4& value) const
+{
+	auto loc = glGetUniformLocation(m_program, name.data());
+	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void CShader::UseShader() const
+{
+	glUseProgram(this->m_program);
 }
 
 void CShader::MakeShaderProgram()
@@ -41,15 +54,15 @@ void CShader::MakeShaderProgram()
 	MakeVertexShaders(); //--- 버텍스 세이더 만들기
 	MakeFragmentShaders(); //--- 프래그먼트 세이더 만들기
 	//-- shader Program
-	shaderID = glCreateProgram();
-	glAttachShader(shaderID, vertexShader);
-	glAttachShader(shaderID, fragmentShader);
-	glLinkProgram(shaderID);
+	m_program = glCreateProgram();
+	glAttachShader(m_program, vertexShader);
+	glAttachShader(m_program, fragmentShader);
+	glLinkProgram(m_program);
 	//--- 세이더 삭제하기
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	//--- Shader Program 사용하기
-	glUseProgram(shaderID);
+	glUseProgram(m_program);
 }
 
 void CShader::MakeVertexShaders()
