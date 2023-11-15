@@ -17,14 +17,17 @@ int main(int argc, char** argv)
 
 	context.Init();
 	// ±Ì¿Ã ∞ÀªÁ º≥¡§
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
 	while (1) {
 
-		context.Update();
 		glutPostRedisplay();
+		context.Update();
 		glutMainLoop();
 	}
 	// ±Ì¿Ã 
-	//glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 }
 
