@@ -19,51 +19,77 @@ CContext::~CContext()
     if (m_indexbuffer) {
         delete m_indexbuffer;
     }
-
 }
 
 
 void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
 {
-    switch (key) {
-    case 'o':
+    const float camera_speed = 0.05f;
 
+    // 카메라 x축은 카메라 UP벡터와 z축 벡터의 직교를 단위 벡터로 만든 것이다.
+    auto camera_right = glm::normalize(glm::cross(m_camera_up, -m_camera_front));
+    auto camera_up = glm::normalize(glm::cross(-m_camera_front, camera_right));
+    switch (key) {
+    case 'a':
+        m_camera_pos -= camera_speed * camera_right;
         break;
+    case 'd':
+        m_camera_pos += camera_speed * camera_right;
+        break;
+    case 'Z':
+        m_camera_pos += camera_speed * m_camera_front;
+        break;
+    case 'z':
+        m_camera_pos -= camera_speed * m_camera_front;
+        break;
+    case 'w':
+        m_camera_pos += camera_speed * camera_up;
+        break;
+    case 's':
+        m_camera_pos -= camera_speed * camera_up;
+        break;
+    case 'q':
+        exit(0);
     default:
         break;
     }
+
+    glutPostRedisplay();
 }
 
 void CContext::Mouse(const int& button, const int& state, const int& x, const int& y)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        m_prev_mousePos = CGL::GetInstance()->ConvertPoint(x, y);
         m_camera_control = true;
     }
     else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
         m_camera_control = false;
     }
+    glutPostRedisplay();
 }
 
 void CContext::Motion(const int& x, const int& y)
 {
     if (!m_camera_control) return;
 
+    static auto prev_pos = CGL::GetInstance()->ConvertPoint(x, y);
     auto pos = CGL::GetInstance()->ConvertPoint(x, y);
-    auto deltaPos = pos - m_prev_mousePos;
+    auto deltaPos = pos - prev_pos;
 
     const float cameraRotSpeed = 3.0f;
-    m_camera_yaw += deltaPos.x * cameraRotSpeed;
+    m_camera_yaw -= deltaPos.x * cameraRotSpeed;
     m_camera_pitch -= deltaPos.y * cameraRotSpeed;
 
+    // 0 ~ 360 사이
     if (m_camera_yaw < 0.0f)   m_camera_yaw += 360.0f;
     if (m_camera_yaw > 360.0f) m_camera_yaw -= 360.0f;
 
     if (m_camera_pitch > 89.0f)  m_camera_pitch = 89.0f;
     if (m_camera_pitch < -89.0f) m_camera_pitch = -89.0f;
 
-    m_prev_mousePos = pos;
+    prev_pos = pos;
 
+    glutPostRedisplay();
 }
 
 void CContext::Render()
@@ -81,7 +107,7 @@ void CContext::Render()
         m_camera_pos + m_camera_front,
         m_camera_up);
 
-    auto model = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+    auto model = glm::mat4(1.0f);
     auto transform = projection * view * model;
     m_program->SetUniform("transform", transform);
 
