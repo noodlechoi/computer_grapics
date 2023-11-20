@@ -21,6 +21,7 @@ private:
 	glm::vec3 m_camera_pos{ glm::vec3(0.0f, 0.0f, 3.0f) };
 	glm::vec3 m_camera_front{ glm::vec3(0.0f, 0.0f, -1.0f) };
 	glm::vec3 m_camera_up{ glm::vec3(0.0f, 1.0f, 0.0f) };
+	glm::vec2 m_prev_pos{ glm::vec2(0.0f, 0.0f) };
 public:
 	CContext();
 	~CContext();

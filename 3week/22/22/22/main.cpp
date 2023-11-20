@@ -1,4 +1,5 @@
 #include "Context.h"
+#include "ReadObj.h"
 
 CContext context;
 
@@ -21,6 +22,7 @@ void DrawScene()
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	context.Update();
 	context.Render();
 	glutSwapBuffers();
 }
@@ -42,6 +44,9 @@ void Motion(int x, int y)
 
 int main(int argc, char** argv)
 {
+	CReadObj r;
+	r.read_obj("res/sphere.obj");
+
 	CGL::GetInstance()->InitWindow(argc, argv, WIDTH, HEIGHT, "½Ç½À 22");
 	CGL::GetInstance()->Render(DrawScene);
 
@@ -53,7 +58,6 @@ int main(int argc, char** argv)
 	PrintKey();
 	while (1) {
 
-		context.Update();
 		glutKeyboardFunc(KeyBoard);
 		glutMouseFunc(Mouse);
 		glutMotionFunc(Motion);

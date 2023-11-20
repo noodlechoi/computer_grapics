@@ -1,12 +1,10 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS //--- 프로그램 맨 앞에 선언할 것
-//#include <stdlib.h>
-//#include <stdio.h>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <vector>
-//#include <cmath>
-//#include <array>
+#include <string>
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>

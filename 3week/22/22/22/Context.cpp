@@ -21,6 +21,16 @@ CContext::~CContext()
     }
 }
 
+/*
+o / O: 앞면이 좌우로 열린다.
+w/a/s/d: 로봇이 앞/뒤/좌/우 방향으로 이동 방향을 바꿔서 걷는다. 가장자리에 도달하면 로봇은 뒤로 돌아 다시 걷는다
++/-: 걷는 속도가 빨라지거나/느려진다.
+j: 로봇이 제자리에서 점프한다.
+i: 모든 변환을 리셋하고 다시 시작
+z/Z: 앞뒤로 이동
+x/X: 좌우로 이동
+y/Y: 카메라가 현재 위치에서 화면 중심 y축을 기준으로 공전
+*/
 
 void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
 {
@@ -30,10 +40,12 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
     auto camera_right = glm::normalize(glm::cross(m_camera_up, -m_camera_front));
     auto camera_up = glm::normalize(glm::cross(-m_camera_front, camera_right));
     switch (key) {
-    case 'a':
+    case 'o':
+        break;
+    case 'x':
         m_camera_pos -= camera_speed * camera_right;
         break;
-    case 'd':
+    case 'X':
         m_camera_pos += camera_speed * camera_right;
         break;
     case 'Z':
@@ -43,10 +55,8 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
         m_camera_pos -= camera_speed * m_camera_front;
         break;
     case 'w':
-        m_camera_pos += camera_speed * camera_up;
         break;
     case 's':
-        m_camera_pos -= camera_speed * camera_up;
         break;
     case 'q':
         exit(0);
@@ -59,12 +69,12 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
 
 void CContext::Mouse(const int& button, const int& state, const int& x, const int& y)
 {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    /*if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         m_camera_control = true;
     }
     else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
         m_camera_control = false;
-    }
+    }*/
     glutPostRedisplay();
 }
 
@@ -72,22 +82,20 @@ void CContext::Motion(const int& x, const int& y)
 {
     if (!m_camera_control) return;
 
-    static auto prev_pos = CGL::GetInstance()->ConvertPoint(x, y);
     auto pos = CGL::GetInstance()->ConvertPoint(x, y);
-    auto deltaPos = pos - prev_pos;
+    auto deltaPos = pos - m_prev_pos;
 
     const float cameraRotSpeed = 3.0f;
-    m_camera_yaw -= deltaPos.x * cameraRotSpeed;
+    m_camera_yaw += deltaPos.x * cameraRotSpeed;
     m_camera_pitch -= deltaPos.y * cameraRotSpeed;
 
-    // 0 ~ 360 사이
-    if (m_camera_yaw < 0.0f)   m_camera_yaw += 360.0f;
-    if (m_camera_yaw > 360.0f) m_camera_yaw -= 360.0f;
+    //if (m_camera_yaw < 0.0f)   m_camera_yaw += 360.0f;
+    //if (m_camera_yaw > 360.0f) m_camera_yaw -= 360.0f;
 
-    if (m_camera_pitch > 89.0f)  m_camera_pitch = 89.0f;
-    if (m_camera_pitch < -89.0f) m_camera_pitch = -89.0f;
+    //if (m_camera_pitch > 89.0f)  m_camera_pitch = 89.0f;
+    //if (m_camera_pitch < -89.0f) m_camera_pitch = -89.0f;
 
-    prev_pos = pos;
+    m_prev_pos = pos;
 
     glutPostRedisplay();
 }
@@ -107,12 +115,12 @@ void CContext::Render()
         m_camera_pos + m_camera_front,
         m_camera_up);
 
-    auto model = glm::mat4(1.0f);
+    auto model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
     auto transform = projection * view * model;
     m_program->SetUniform("transform", transform);
 
     // 그리기
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 42, GL_UNSIGNED_INT, 0);
 }
 
 void CContext::Init()
@@ -155,6 +163,8 @@ void CContext::Init()
         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // 6
         0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // 7
 
+        0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 24
+        0.0f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 25
     };
 
     unsigned int indices[] = {
@@ -164,26 +174,26 @@ void CContext::Init()
          0 + 8, 4 + 8, 3 + 8, 3 + 8, 4 + 8, 7 + 8,
          // right
          4 , 5, 6, 4, 6, 7,
-         // front
-         0 + 16, 5 + 16, 4 + 16, 0 + 16, 1 + 16, 5 + 16,
          // down
          1 + 8, 2 + 8, 5 + 8, 2 + 8, 6 + 8, 5 + 8,
          // back
          3 + 16, 7 + 16, 6 + 16, 3 + 16, 6 + 16, 2 + 16,
+         // front
+         0 + 16, 1 + 16, 25,  0 + 16, 25, 24,
+         24, 25, 5 + 16, 24, 5 + 16, 4 + 16,
     };
 
     m_vao = new CVAO();
     m_vao->Gen();
 
-    m_vertexbuffer = new CBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, sizeof(float) * 6 * 4 * 6);
+    m_vertexbuffer = new CBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, (sizeof(float) * 6 * 4 * 6 + sizeof(float) * 2 * 6));
 
     m_vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
     m_vao->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (sizeof(float) * 3));
 
-    m_indexbuffer = new CBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(unsigned int) * 6 * 6);
+    m_indexbuffer = new CBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(unsigned int) * 6 * 7);
 }
 
 void CContext::Update()
 {
-    std::cout << "update" << std::endl;
 }
