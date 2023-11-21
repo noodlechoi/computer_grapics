@@ -110,14 +110,19 @@ void CContext::Render()
         m_camera_up);
 
     m_program->UseShader();
+    m_program->SetUniform("viewPos", m_camera_pos);
     m_program->SetUniform("lightPos", m_light_color);
     m_program->SetUniform("lightColor", m_light_color);
     m_program->SetUniform("objectColor", m_object_color);
     m_program->SetUniform("ambientStrength", m_ambient_strength);
+    m_program->SetUniform("specularStrength", m_spec_strength);
+    m_program->SetUniform("specularShininess", m_spec_shininess);
+
 
     // 모델 변환
     auto model = glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(1.0f, 0.0f, 0.0f));
     auto transform = projection * view * model;
+    // transform, model 변환 행렬 전달
     m_program->SetUniform("transform", transform);
     m_program->SetUniform("modelTransform", model);
     m_program->SetUniform("invModelTransform", transpose(inverse(model)));
