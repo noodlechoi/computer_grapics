@@ -21,6 +21,10 @@ public:
 	void EnableLocation(const std::string_view name) const;
 	void DisableLocation(const std::string_view name) const;
 	void SetUniform(const std::string_view name, int value) const;
+	void SetUniform(const std::string_view name, float value) const;
+	void SetUniform(const std::string_view name, const glm::vec2& value) const;
+	void SetUniform(const std::string_view name, const glm::vec3& value) const;
+	void SetUniform(const std::string_view name, const glm::vec4& value) const;
 	void SetUniform(const std::string_view name, const glm::mat4& value) const;
 	void UseShader() const;
 	void MakeShaderProgram();

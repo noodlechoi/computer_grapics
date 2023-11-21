@@ -1,5 +1,5 @@
 #pragma once
-#include "opengl_class/header.h"
+#include "header.h"
 
 // 텍스트 파일에 있는 버텍스를 읽는
 class CReadObj
@@ -15,6 +15,10 @@ public:
 	CReadObj();
 	~CReadObj();
 public:
-	bool read_obj(std::string_view name);
+	bool ReadObj(std::string_view name);
+	std::vector<glm::vec3> GetVertex();
+	std::vector<glm::vec3> GetNormal();
+	std::vector<glm::vec3> GetVertexBuff();
+	std::vector<glm::vec3> GetNormalBuff();
 };
 

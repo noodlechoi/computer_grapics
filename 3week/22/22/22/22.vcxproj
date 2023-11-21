@@ -134,12 +134,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="opengl_class\Figure.cpp" />
     <ClCompile Include="opengl_class\GL.cpp" />
+    <ClCompile Include="opengl_class\ReadObj.cpp" />
     <ClCompile Include="opengl_class\Rectangle.cpp" />
     <ClCompile Include="opengl_class\Shader.cpp" />
     <ClCompile Include="opengl_class\Triangle.cpp" />
     <ClCompile Include="opengl_class\VAO.cpp" />
     <ClCompile Include="opengl_class\Buffer.cpp" />
-    <ClCompile Include="ReadObj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
@@ -147,13 +147,13 @@
     <ClInclude Include="opengl_class\GL.h" />
     <ClInclude Include="opengl_class\header.h" />
     <ClInclude Include="opengl_class\header_user.h" />
+    <ClInclude Include="opengl_class\ReadObj.h" />
     <ClInclude Include="opengl_class\Rectangle.h" />
     <ClInclude Include="opengl_class\Shader.h" />
     <ClInclude Include="opengl_class\Triangle.h" />
     <ClInclude Include="opengl_class\Type.h" />
     <ClInclude Include="opengl_class\VAO.h" />
     <ClInclude Include="opengl_class\Buffer.h" />
-    <ClInclude Include="ReadObj.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="opengl_class\frequently_used_code.txt" />

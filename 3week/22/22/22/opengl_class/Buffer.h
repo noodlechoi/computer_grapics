@@ -1,7 +1,7 @@
-#pragma once
+ï»¿#pragma once
 #include "header.h"
 
-// VBO, EBO  ¹öÆÛ ÀúÀå Å¬·¡½º
+// VBO, EBO  Â¹Ã¶Ã†Ã› Ã€ÃºÃ€Ã¥ Ã…Â¬Â·Â¡Â½Âº
 class CBuffer
 {
 private:
@@ -17,4 +17,3 @@ public:
 	void Gen(unsigned int bufferType, unsigned int usage, const void* data, const unsigned int m_size);
 	void Bind() const;
 };
-

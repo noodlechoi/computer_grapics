@@ -69,12 +69,13 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
 
 void CContext::Mouse(const int& button, const int& state, const int& x, const int& y)
 {
-    /*if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        m_prev_pos = CGL::GetInstance()->ConvertPoint(x, y);
         m_camera_control = true;
     }
     else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
         m_camera_control = false;
-    }*/
+    }
     glutPostRedisplay();
 }
 
@@ -85,15 +86,9 @@ void CContext::Motion(const int& x, const int& y)
     auto pos = CGL::GetInstance()->ConvertPoint(x, y);
     auto deltaPos = pos - m_prev_pos;
 
-    const float cameraRotSpeed = 3.0f;
-    m_camera_yaw += deltaPos.x * cameraRotSpeed;
-    m_camera_pitch -= deltaPos.y * cameraRotSpeed;
-
-    //if (m_camera_yaw < 0.0f)   m_camera_yaw += 360.0f;
-    //if (m_camera_yaw > 360.0f) m_camera_yaw -= 360.0f;
-
-    //if (m_camera_pitch > 89.0f)  m_camera_pitch = 89.0f;
-    //if (m_camera_pitch < -89.0f) m_camera_pitch = -89.0f;
+    const float object_speed = 3.0f;
+    m_obj_radian_x += deltaPos.x * object_speed;
+    m_obj_radian_y -= deltaPos.y * object_speed;
 
     m_prev_pos = pos;
 
@@ -102,7 +97,6 @@ void CContext::Motion(const int& x, const int& y)
 
 void CContext::Render()
 {
-    m_program->UseShader();
 
     m_camera_front = glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_yaw), glm::vec3(0.0f, 1.0f, 0.0f)) * 
         glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_pitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
@@ -115,12 +109,21 @@ void CContext::Render()
         m_camera_pos + m_camera_front,
         m_camera_up);
 
-    auto model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+    m_program->UseShader();
+    m_program->SetUniform("lightPos", m_light_color);
+    m_program->SetUniform("lightColor", m_light_color);
+    m_program->SetUniform("objectColor", m_object_color);
+    m_program->SetUniform("ambientStrength", m_ambient_strength);
+
+    // ¸ðµ¨ º¯È¯
+    auto model = glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(1.0f, 0.0f, 0.0f));
     auto transform = projection * view * model;
     m_program->SetUniform("transform", transform);
+    m_program->SetUniform("modelTransform", model);
+    m_program->SetUniform("invModelTransform", transpose(inverse(model)));
 
     // ±×¸®±â
-    glDrawElements(GL_TRIANGLES, 42, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
 void CContext::Init()
@@ -129,69 +132,55 @@ void CContext::Init()
 	m_program->MakeShaderProgram();
 
     float vertices[] = {
-        // À°¸éÃ¼
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
 
-        // color different
-        // blue
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, // 0
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,// 1
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,// 2
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,// 3
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, // 4
-        0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, // 5
-        0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // 6
-        0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, // 7
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-        // green
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 0
-        -0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f,// 1
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,// 2
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 1.0f,// 3
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
 
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 4
-        0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 5
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // 6
-        0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // 7
-
-        0.0f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 24
-        0.0f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 25
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
     };
 
-    unsigned int indices[] = {
-        // left
-         0, 3, 2, 0, 2, 1,
-         // up
-         0 + 8, 4 + 8, 3 + 8, 3 + 8, 4 + 8, 7 + 8,
-         // right
-         4 , 5, 6, 4, 6, 7,
-         // down
-         1 + 8, 2 + 8, 5 + 8, 2 + 8, 6 + 8, 5 + 8,
-         // back
-         3 + 16, 7 + 16, 6 + 16, 3 + 16, 6 + 16, 2 + 16,
-         // front
-         0 + 16, 1 + 16, 25,  0 + 16, 25, 24,
-         24, 25, 5 + 16, 24, 5 + 16, 4 + 16,
+    uint32_t indices[] = {
+         0,  2,  1,  2,  0,  3,
+         4,  5,  6,  6,  7,  4,
+         8,  9, 10, 10, 11,  8,
+        12, 14, 13, 14, 12, 15,
+        16, 17, 18, 18, 19, 16,
+        20, 22, 21, 22, 20, 23,
     };
 
     m_vao = new CVAO();
     m_vao->Gen();
 
-    m_vertexbuffer = new CBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, (sizeof(float) * 6 * 4 * 6 + sizeof(float) * 2 * 6));
+    m_vertexbuffer = new CBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, vertices, (sizeof(float) * 6 * 6 * 4));
 
     m_vao->SetAttrib(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
     m_vao->SetAttrib(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (sizeof(float) * 3));
 
-    m_indexbuffer = new CBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(unsigned int) * 6 * 7);
+    m_indexbuffer = new CBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices, sizeof(unsigned int) * 6 * 6);
 }
 
 void CContext::Update()

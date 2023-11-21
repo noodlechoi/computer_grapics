@@ -8,7 +8,7 @@ CReadObj::~CReadObj()
 {
 }
 
-bool CReadObj::read_obj(std::string_view name)
+bool CReadObj::ReadObj(std::string_view name)
 {
 	m_file.open(name.data());
 
@@ -58,4 +58,24 @@ bool CReadObj::read_obj(std::string_view name)
     m_file.close();
 
     return true;
+}
+
+std::vector<glm::vec3> CReadObj::GetVertex()
+{
+    return m_vertices;
+}
+
+std::vector<glm::vec3> CReadObj::GetNormal()
+{
+    return m_normals;
+}
+
+std::vector<glm::vec3> CReadObj::GetVertexBuff()
+{
+    return m_v_index_buff;
+}
+
+std::vector<glm::vec3> CReadObj::GetNormalBuff()
+{
+    return m_vn_index_buff;
 }

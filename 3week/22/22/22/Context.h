@@ -10,6 +10,10 @@ private:
 	CBuffer* m_vertexbuffer;
 	CBuffer* m_indexbuffer;
 
+	// object
+	float m_obj_radian_x{ 0.0f };
+	float m_obj_radian_y{ 0.0f };
+
 	// camera parameter
 	bool m_camera_control{ false };
 	
@@ -22,6 +26,13 @@ private:
 	glm::vec3 m_camera_front{ glm::vec3(0.0f, 0.0f, -1.0f) };
 	glm::vec3 m_camera_up{ glm::vec3(0.0f, 1.0f, 0.0f) };
 	glm::vec2 m_prev_pos{ glm::vec2(0.0f, 0.0f) };
+
+	// light
+	glm::vec3 m_light_pos{ glm::vec3(3.0f, 3.0f, 3.0f) };
+	glm::vec3 m_light_color{ glm::vec3(1.0f, 1.0f, 1.0f) };
+	glm::vec3 m_object_color{ glm::vec3(1.0f, 0.5f, 0.0f) };
+	float m_ambient_strength{ 0.1f };
+
 public:
 	CContext();
 	~CContext();

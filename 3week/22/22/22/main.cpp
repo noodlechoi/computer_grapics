@@ -1,11 +1,9 @@
 #include "Context.h"
-#include "ReadObj.h"
 
 CContext context;
 
 using std::cout;
 using std::endl;
-
 void PrintKey()
 {
 	cout << "o / O: 앞면이 좌우로 열린다." << endl;
@@ -44,9 +42,6 @@ void Motion(int x, int y)
 
 int main(int argc, char** argv)
 {
-	CReadObj r;
-	r.read_obj("res/sphere.obj");
-
 	CGL::GetInstance()->InitWindow(argc, argv, WIDTH, HEIGHT, "실습 22");
 	CGL::GetInstance()->Render(DrawScene);
 
