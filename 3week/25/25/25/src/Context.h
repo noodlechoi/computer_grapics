@@ -1,14 +1,14 @@
 #pragma once
-#include "opengl_class/header.h"
-#include "opengl_class/header_user.h"
+#include "header.h"
+#include "header_user.h"
+#include "Model.h"
 
 class CContext
 {
 private:
 	CShader* m_program;
-	CVAO* m_vao;
-	CBuffer* m_vertexbuffer;
-	CBuffer* m_indexbuffer;
+	CModel m_model;
+	//std::vector<CMesh*>m_meshes;
 
 	// object
 	float m_obj_radian_x{ 0.0f };
@@ -22,7 +22,7 @@ private:
 	float m_camera_yaw{ 0.0f }; // y축
 	// roll 대신 up vector로 컨트롤
 
-	glm::vec3 m_camera_pos{ glm::vec3(0.0f, 0.0f, 3.0f) };
+	glm::vec3 m_camera_pos{ glm::vec3(0.0f, 0.0f, 10.0f) };
 	glm::vec3 m_camera_front{ glm::vec3(0.0f, 0.0f, -1.0f) };
 	glm::vec3 m_camera_up{ glm::vec3(0.0f, 1.0f, 0.0f) };
 	glm::vec2 m_prev_pos{ glm::vec2(0.0f, 0.0f) };
@@ -34,7 +34,6 @@ private:
 	float m_ambient_strength{ 0.1f };
 	float m_spec_strength{ 0.5f };
 	float m_spec_shininess{ 32.0f };
-
 
 public:
 	CContext();

@@ -1,6 +1,5 @@
 #pragma once
 #include "header.h"
-#include "Type.h"
 
 class CGL
 {
