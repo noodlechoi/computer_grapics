@@ -7,8 +7,9 @@ class CContext
 {
 private:
 	CShader* m_program;
-	CModel m_model;
-	//std::vector<CMesh*>m_meshes;
+	//CModel m_model;
+	CMesh* m_box;
+	std::vector<CMesh*>m_meshes;
 
 	// object
 	float m_obj_radian_x{ 0.0f };
@@ -27,14 +28,23 @@ private:
 	glm::vec3 m_camera_up{ glm::vec3(0.0f, 1.0f, 0.0f) };
 	glm::vec2 m_prev_pos{ glm::vec2(0.0f, 0.0f) };
 
-	// light
-	glm::vec3 m_light_pos{ glm::vec3(3.0f, 3.0f, 3.0f) };
-	glm::vec3 m_light_color{ glm::vec3(1.0f, 1.0f, 1.0f) };
-	glm::vec3 m_object_color{ glm::vec3(1.0f, 0.5f, 0.0f) };
-	float m_ambient_strength{ 0.1f };
-	float m_spec_strength{ 0.5f };
-	float m_spec_shininess{ 32.0f };
+	// light parameter
+	struct Light {
+		glm::vec3 position{ glm::vec3(2.0f, 0.0f, 0.0f) };
+		glm::vec3 ambient{ glm::vec3(0.1f, 0.1f, 0.1f) };
+		glm::vec3 diffuse{ glm::vec3(0.5f, 0.5f, 0.5f) };
+		glm::vec3 specular{ glm::vec3(1.0f, 1.0f, 1.0f) };
+	};
+	Light m_light;
 
+	// material parameter
+	struct Material {
+		glm::vec3 ambient{ glm::vec3(1.0f, 0.5f, 0.3f) };
+		glm::vec3 diffuse{ glm::vec3(1.0f, 0.5f, 0.2f) };
+		glm::vec3 specular{ glm::vec3(1.0f, 1.0f, 1.0f) };
+		float shininess{ 32.0f };
+	};
+	Material m_material;
 public:
 	CContext();
 	~CContext();

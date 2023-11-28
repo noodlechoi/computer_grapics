@@ -89,18 +89,36 @@ void CContext::Render()
         m_camera_pos + m_camera_front,
         m_camera_up);
 
+
+    
     m_program->UseShader();
+
+    // Á¶¸í
+    auto lightModelTransform = glm::translate(glm::mat4(1.0), m_light.position) *
+                                glm::scale(glm::mat4(1.0), glm::vec3(0.1f));
+    m_program->SetUniform("lightPos", m_light.position);
+    m_program->SetUniform("light.ambient", glm::vec3(1.0f));
+    m_program->SetUniform("material.ambient", glm::vec3(1.0f));
+    m_program->SetUniform("transform", projection * view * lightModelTransform);
+    m_program->SetUniform("modelTransform", lightModelTransform);
+    m_program->SetUniform("invModelTransform", transpose(inverse(lightModelTransform)));
+
+    m_box->Draw(m_program);
+
+    // ¸ðµ¨ Á¶¸í
     m_program->SetUniform("viewPos", m_camera_pos);
-    m_program->SetUniform("lightPos", m_light_color);
-    m_program->SetUniform("lightColor", m_light_color);
-    m_program->SetUniform("objectColor", m_object_color);
-    m_program->SetUniform("ambientStrength", m_ambient_strength);
-    m_program->SetUniform("specularStrength", m_spec_strength);
-    m_program->SetUniform("specularShininess", m_spec_shininess);
+    m_program->SetUniform("light.position", m_light.position);
+    m_program->SetUniform("light.ambient", m_light.ambient);
+    m_program->SetUniform("light.diffuse", m_light.diffuse);
+    m_program->SetUniform("light.specular", m_light.specular);
+    m_program->SetUniform("material.ambient", m_material.ambient);
+    m_program->SetUniform("material.diffuse", m_material.diffuse);
+    m_program->SetUniform("material.specular", m_material.specular);
+    m_program->SetUniform("material.shininess", m_material.shininess);
 
 
     // ¸ðµ¨ º¯È¯
-    auto model = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f, 0.3f, 0.3f))
+    auto model = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f))
         * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(0.0f, 1.0f, 0.0f))
         * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(1.0f, 0.0f, 0.0f));
  
@@ -110,11 +128,11 @@ void CContext::Render()
     m_program->SetUniform("modelTransform", model);
     m_program->SetUniform("invModelTransform", transpose(inverse(model)));
     
-    m_model.Draw(m_program);
+    //m_model.Draw(m_program);
 
-    /*for (auto mesh : m_meshes) {
+    for (auto mesh : m_meshes) {
         mesh->Draw(m_program);
-    }*/
+    }
 }
 
 void CContext::Init()
@@ -123,10 +141,13 @@ void CContext::Init()
 	m_program->MakeShaderProgram();
 
     //m_model.Create("res/sphere.obj");
-    m_model.Create("res/box.txt");
+    //m_model.Create("res/box.txt");
 
-    //m_meshes.push_back(new CMesh);
-    //m_meshes[0]->CreateBox();
+    m_box = new CMesh;
+    m_box->CreateBox();
+
+    m_meshes.push_back(new CMesh);
+    m_meshes[0]->CreateSquarePy();
 }
 
 void CContext::Update()

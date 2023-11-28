@@ -24,5 +24,6 @@ public:
 	void Init(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, unsigned int primitive_type);
 	void Draw(const CShader* program) const;
 	void CreateBox();
+	void CreateSquarePy();
 };
 
