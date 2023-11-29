@@ -4,6 +4,7 @@ CMesh::CMesh() : m_primitive_type{GL_TRIANGLES}
 {
 }
 
+// 프래그먼트가 생성 안됨
 CMesh::CMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, unsigned int primitive_type)
 {
     m_vao = new CVAO();
@@ -41,7 +42,7 @@ void CMesh::Init(const std::vector<Vertex>& vertices, const std::vector<unsigned
 
     m_indexbuffer = new CBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices.data() , sizeof(unsigned int), indices.size());
     
-    m_vao->SetAttrib(0, 3, GL_FLOAT, false, sizeof(Vertex), 0);
+    m_vao->SetAttrib(0, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, position));
     m_vao->SetAttrib(1, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, normal));
 }
 

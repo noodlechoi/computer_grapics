@@ -21,7 +21,9 @@ void CModel::Create(std::string_view name)
         exit(1);
     }
     
-    m_meshes.push_back(new CMesh(vertices, indices, GL_TRIANGLES));
+    CMesh* mesh = new CMesh;
+    mesh->Init(vertices, indices, GL_TRIANGLES);
+    m_meshes.push_back(mesh);
 }
 
 bool CModel::Load(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::string_view name)

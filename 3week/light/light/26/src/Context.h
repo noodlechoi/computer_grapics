@@ -55,7 +55,6 @@ public:
 	void Mouse(const int& button, const int& state, const int& x, const int& y);
 	void Motion(const int& x, const int& y);
 	void Time(int value);
-	bool Load(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::string_view name);
 	void Render();
 	void Update();
 };

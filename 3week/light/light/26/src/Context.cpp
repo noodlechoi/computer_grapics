@@ -127,7 +127,7 @@ void CContext::Render()
         glm::vec3(-4.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, 1.0f),
     };
-    float size[] = {1.0, 0.7, 0.5};
+    float size[] = {0.2, 0.1, 0.05 };
 
     // 모델 변환
     for (int i = 0; i < 3; ++i) {
@@ -142,7 +142,7 @@ void CContext::Render()
         m_program->SetUniform("objectColor", circle_pos[i * 2 + 1]);
 
         auto model = glm::translate(glm::mat4(1.0), circle_pos[i*2])
-            * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(size[i], size[i], size[i]))
             * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
             * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
             * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
