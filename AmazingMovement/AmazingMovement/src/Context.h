@@ -60,8 +60,9 @@ private:
 	float size_width{};
 	float size_height{};
 
+	std::vector<std::vector<float>> rand_size;
 	std::vector<float> time_size;
-	std::vector<bool> size_turn;
+	std::vector<std::vector<bool>> size_turn;
 public:
 	CContext();
 	~CContext();
