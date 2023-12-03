@@ -46,6 +46,9 @@ private:
 	bool x_flag = false;
 	bool y_flag = false;
 	bool Y_flag = false;
+	bool one_flag = false;
+	bool two_flag = false;
+	bool three_flag = false;
 	bool is_start = false;
 	int color_cnt{};
 
@@ -56,6 +59,9 @@ private:
 	glm::vec3 first_box_pos{ glm::vec3(0.0f) };
 	float size_width{};
 	float size_height{};
+
+	std::vector<float> time_size;
+	std::vector<bool> size_turn;
 public:
 	CContext();
 	~CContext();

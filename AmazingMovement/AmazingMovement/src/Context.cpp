@@ -50,6 +50,15 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
     case 'y':
         y_flag = !y_flag;
         break;
+    case '1':
+        one_flag = !one_flag;
+        break;
+    case '2':
+        two_flag = !two_flag;
+        break;
+    case '3':
+        three_flag = !three_flag;
+        break;
     case 's':
         if (m_program) {
             delete m_program;
@@ -76,7 +85,7 @@ void CContext::Motion(const int& x, const int& y)
 
 void CContext::Render()
 {
-    glm::vec3 camera_pos(0.0f, 5.0f, 6.0f);
+    glm::vec3 camera_pos(0.0f, 7.0f, 6.0f);
     auto camera_trans = glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_y), glm::vec3(0.0f, 1.0f, 0.0f));
     camera_pos = camera_trans * glm::vec4(camera_pos, 1.0f);
 
@@ -117,9 +126,19 @@ void CContext::Render()
     CRandom random;
     for (int i = 0; i < div_height; ++i) {
         for (int j = 0; j < div_width; ++j) {
-            auto rand_size = glm::radians(static_cast<float>(random.get(100, 1000)) * 0.1f);
-            auto model = glm::translate(glm::mat4(1.0), glm::vec3(first_box_pos.x + size_width * j, first_box_pos.y + rand_size / 2 , first_box_pos.z - size_height * i))
-                * glm::scale(glm::mat4(1.0f), glm::vec3(size_width, rand_size, size_height))
+            auto size = 1.0f;
+            if (one_flag) {
+                size = glm::radians(static_cast<float>(random.get(100, 1000)) * 0.1f);
+            }
+            else if(two_flag) {
+                size = time_size[j];
+            }
+            else if (three_flag) {
+                size = glm::radians(static_cast<float>(random.get(100, 1000)) * 0.1f);
+            }
+
+            auto model = glm::translate(glm::mat4(1.0), glm::vec3(first_box_pos.x + size_width * j, first_box_pos.y + size / 2 , first_box_pos.z - size_height * i))
+                * glm::scale(glm::mat4(1.0f), glm::vec3(size_width, size, size_height))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -156,6 +175,13 @@ void CContext::Init()
     first_box_pos = glm::vec3(0.0f - ((size_width / 2) * (div_width - 1)), 0.0f, 0.0f - ((size_height / 2) * (div_height - 1)));
 
     is_start = true;
+
+    size_turn.resize(div_width);
+    for (int j = 0; j < div_width; ++j) {
+        float size = 0.3f * (j + 1);
+        time_size.push_back(size);
+        size_turn[j] = false;
+    }
 }
 
 void CContext::Update()
@@ -184,6 +210,23 @@ void CContext::Time(int value)
         else if (Y_flag) {
             m_camera_y -= 10;
             m_camera_yaw -= 10;
+        }
+
+        if (two_flag) {
+            for (int i = 0; i < div_height; ++i) {
+                for (int j = 0; j < div_width; ++j) {
+                    if (size_turn[j]) {
+                        time_size[j] -= 0.1f;
+                    }
+                    else {
+                        time_size[j] += 0.1f;
+                    }
+                    if (time_size[j] >= 2.0f) size_turn[j] = true;
+                    else if (time_size[j] <= 0.3f) size_turn[j] = false;
+                }
+            }
+        }
+        else if (three_flag) {
         }
         glutPostRedisplay();
     }
