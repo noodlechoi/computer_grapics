@@ -135,6 +135,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\VAO.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="src\header_user.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Model.h" />
+    <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Type.h" />
     <ClInclude Include="src\VAO.h" />
