@@ -10,8 +10,11 @@ CContext::~CContext()
     if (m_program) {
         delete m_program;
     }
-    for (auto& mesh : m_meshes) {
+    /*for (auto& mesh : m_meshes) {
         delete mesh;
+    }*/
+    if (m_box) {
+        delete m_box;
     }
 }
 
@@ -23,11 +26,23 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
     auto camera_right = glm::normalize(glm::cross(m_camera_up, -m_camera_front));
     auto camera_up = glm::normalize(glm::cross(-m_camera_front, camera_right));
     switch (key) {
-    case 'c':
-        c_flag = !c_flag;
+    case 't':
+        t_flag = !t_flag;
         break;
-    case 'p':
-        p_flag = !p_flag;
+    case 'c':
+        color_cnt = (color_cnt + 1) % 4;
+        if (color_cnt == 0) {
+            m_light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+        }
+        else if (color_cnt == 1) {
+            m_light_color = glm::vec3(1.0f, 0.1f, 0.1f);
+        }
+        else if (color_cnt == 2) {
+            m_light_color = glm::vec3(0.1f, 1.0f, 1.0f);
+        }
+        else if (color_cnt == 3) {
+            m_light_color = glm::vec3(0.8f, 0.8f, 0.1f);
+        }
         break;
     case 'x':
         x_flag = !x_flag;
@@ -39,14 +54,7 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
         if (m_program) {
             delete m_program;
         }
-        for (auto& mesh : m_meshes) {
-            delete mesh;
-        }
-        m_meshes.clear();
-        c_flag = false;
-        /*bool p_flag = false;
-        bool x_flag = false;
-        bool y_flag = false;*/
+        
         Init();
         break;
     case 'q':
@@ -110,35 +118,37 @@ void CContext::Render()
     // 모델 조명
     m_program->SetUniform("viewPos", m_camera_pos);
     m_program->SetUniform("lightPos", light_pos);
-    m_program->SetUniform("lightColor", m_light_color);
     m_program->SetUniform("ambientStrength", m_ambient_strength);
     m_program->SetUniform("specularStrength", m_spec_strength);
     m_program->SetUniform("specularShininess", m_spec_shininess);
-
     m_program->SetUniform("objectColor", m_object_color);
 
-    auto model = glm::translate(glm::mat4(1.0), glm::vec3(0.0f))
-        * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
- 
-    auto transform = projection * view * model;
-    // transform, model 변환 행렬 전달
-    m_program->SetUniform("transform", transform);
-    m_program->SetUniform("modelTransform", model);
-    m_program->SetUniform("invModelTransform", transpose(inverse(model)));
-    
-    if (c_flag) {
-        m_meshes[0]->Draw(m_program);
+    if (!t_flag) {
+        m_program->SetUniform("lightColor", m_light_color);
     }
-    else if (p_flag) {
-        m_meshes[1]->Draw(m_program);
+    else {
+        // 조명 끄기
+        m_program->SetUniform("lightColor", glm::vec3(0.1f));
     }
 
-    //for (auto mesh : m_meshes) {
-    //    mesh->Draw(m_program);
-    //}
+
+    for (int i = 0; i < div_height; ++i) {
+        for (int j = 0; j < div_width; ++j) {
+            auto model = glm::translate(glm::mat4(1.0), glm::vec3(first_box_pos.x + size_width * j, 0.0f, first_box_pos.z - size_height * i))
+                * glm::scale(glm::mat4(1.0f), glm::vec3(size_width, 1.0f, size_height))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+ 
+            auto transform = projection * view * model;
+            // transform, model 변환 행렬 전달
+            m_program->SetUniform("transform", transform);
+            m_program->SetUniform("modelTransform", model);
+            m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+    
+            m_box->Draw(m_program);
+        }
+    }
 }
 
 void CContext::Init()
@@ -146,12 +156,19 @@ void CContext::Init()
 	m_program = new CShader("vertex.glsl", "fragment.glsl");
 	m_program->MakeShaderProgram();
 
+    m_box = new CMesh();
+    m_box->CreateBox();
 
-    m_meshes.push_back(new CMesh);
-    m_meshes[0]->CreateBox();
-
-    m_meshes.push_back(new CMesh);
-    m_meshes[1]->CreateSquarePy();
+    while (true) {
+        std::cout << "가로 세로 입력(5 ~ 20): ";
+        std::cin >> div_width >> div_height;
+        if (div_width >= 5 && div_width <= 20 && div_height >= 5 && div_height <= 20) {
+            break;
+        }
+    }
+    size_width = 1.0f / div_width;
+    size_height = 1.0f / div_height;
+    first_box_pos = glm::vec3(0.0f - ((size_width / 2) * (div_width - 1)), 0.0f, 0.0f - ((size_height / 2) * (div_height - 1)));
 }
 
 void CContext::Update()
