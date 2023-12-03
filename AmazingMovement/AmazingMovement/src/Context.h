@@ -22,7 +22,7 @@ private:
 
 
 	// camera front 방향 결정 각도
-	float m_camera_pitch{ -40.0f }; // x축
+	float m_camera_pitch{ -50.0f }; // x축
 	float m_camera_yaw{ 0.0f }; // y축
 	// roll 대신 up vector로 컨트롤
 
@@ -43,7 +43,6 @@ private:
 
 	// 실습 키 입력 flag
 	bool t_flag = false;
-	bool x_flag = false;
 	bool y_flag = false;
 	bool Y_flag = false;
 	bool one_flag = false;
@@ -63,6 +62,8 @@ private:
 	std::vector<std::vector<float>> rand_size;
 	std::vector<float> time_size;
 	std::vector<std::vector<bool>> size_turn;
+	std::vector<std::vector<float>> pyramid_size;
+	int ani_speed{ 100 };
 public:
 	CContext();
 	~CContext();
@@ -74,5 +75,6 @@ public:
 	void Time(int value);
 	void Render();
 	void Update();
+	int GetSpeed() { return ani_speed; };
 };
 

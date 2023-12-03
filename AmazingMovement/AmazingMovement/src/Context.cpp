@@ -59,11 +59,37 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
     case '3':
         three_flag = !three_flag;
         break;
-    case 's':
+    case '+':
+        if (ani_speed >= 10) {
+            ani_speed -= 10;
+        }
+        break;
+    case '-':
+        if (ani_speed <= 10000) {
+            ani_speed += 10;
+        }
+        break;
+    case 'r':
         if (m_program) {
             delete m_program;
         }
-        
+        if (m_box) {
+            delete m_box;
+        }
+        // 변수 초기화
+        t_flag = false;
+        y_flag = false;
+        Y_flag = false;
+        one_flag = false;
+        two_flag = false;
+        three_flag = false;
+        is_start = false;
+        m_camera_y = 0.0f;
+        m_camera_yaw = 0.0f;
+        m_light_obj_y= 0.0f;
+        ani_speed = 100;
+        color_cnt = 0;
+        m_light_color = glm::vec3(1.0f, 1.0f, 1.0f);
         Init();
         break;
     case 'q':
@@ -133,6 +159,7 @@ void CContext::Render()
                 size = time_size[j];
             }
             else if (three_flag) {
+                size = pyramid_size[i][j];
             }
 
             auto model = glm::translate(glm::mat4(1.0), glm::vec3(first_box_pos.x + size_width * j, first_box_pos.y + size / 2 , first_box_pos.z - size_height * i))
@@ -189,6 +216,20 @@ void CContext::Init()
         float size = 0.3f * (j + 1);
         time_size.push_back(size);
     }
+
+    // 초기화
+    pyramid_size.resize(div_height);
+    for (int i = 0; i < div_height; ++i) {
+        pyramid_size[i].resize(div_width);
+    }
+
+    float size = 0.1f;
+    for (int i = 0; i < div_height; ++i) {
+        for (int j = 0; j < div_width; ++j) {
+            pyramid_size[i][j] = size;
+            size += 0.1f;
+        }
+    }
 }
 
 void CContext::Update()
@@ -206,9 +247,6 @@ void CContext::Time(int value)
                 first_box_pos.y = 0.0f;
                 m_obj_radian_y = 0;
             }
-        }
-        if (x_flag) {
-            m_obj_radian_x += 10;
         }
         if (y_flag) {
             m_camera_y += 10;
@@ -246,6 +284,18 @@ void CContext::Time(int value)
             }
         }
         else if (three_flag) {
+            for (int i = 0; i < div_height; ++i) {
+                for (int j = 0; j < div_width; ++j) {
+                    if (size_turn[i][j]) {
+                        pyramid_size[i][j] -= 0.1f;
+                    }
+                    else {
+                        pyramid_size[i][j] += 0.1f;
+                    }
+                    if (pyramid_size[i][j] >= 2.0f) size_turn[i][j] = true;
+                    else if (pyramid_size[i][j] <= 0.3f) size_turn[i][j] = false;
+                }
+            }
         }
         glutPostRedisplay();
     }
