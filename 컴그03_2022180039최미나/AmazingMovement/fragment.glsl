@@ -1,11 +1,8 @@
 #version 330 core
 
 in vec3 out_Normal; 
-in vec2 out_Text;
 in vec3 out_Position;
 out vec4 FragColor; //--- 색상 출력
-
-uniform sampler2D tex;
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
@@ -29,6 +26,5 @@ void main(void)
 	vec3 specular = specularStrength * spec * lightColor;
 
 	vec3 result = (ambient + diffuse + specular) * objectColor;
-	//	FragColor = vec4 (result, 1.0);
-    FragColor = texture(tex, out_Text);
+	FragColor = vec4 (result, 1.0);
 }

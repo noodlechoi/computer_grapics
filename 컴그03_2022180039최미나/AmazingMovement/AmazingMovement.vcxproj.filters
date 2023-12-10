@@ -14,7 +14,7 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="소스 파일\src">
-      <UniqueIdentifier>{91b55ee2-dab3-49a0-9e32-5adc5cd846d5}</UniqueIdentifier>
+      <UniqueIdentifier>{4fa09c6a-1f41-4e8a-8adb-4b1a1578d099}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +40,9 @@
       <Filter>소스 파일\src</Filter>
     </ClCompile>
     <ClCompile Include="src\VAO.cpp">
+      <Filter>소스 파일\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Random.cpp">
       <Filter>소스 파일\src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -72,6 +75,9 @@
       <Filter>소스 파일\src</Filter>
     </ClInclude>
     <ClInclude Include="src\VAO.h">
+      <Filter>소스 파일\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Random.h">
       <Filter>소스 파일\src</Filter>
     </ClInclude>
   </ItemGroup>

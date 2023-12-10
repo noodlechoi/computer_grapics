@@ -14,8 +14,16 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="소스 파일\src">
-      <UniqueIdentifier>{91b55ee2-dab3-49a0-9e32-5adc5cd846d5}</UniqueIdentifier>
+      <UniqueIdentifier>{aab40cb4-ea39-46cf-aec3-9e8b3330aee5}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fragment.glsl">
+      <Filter>소스 파일</Filter>
+    </None>
+    <None Include="vertex.glsl">
+      <Filter>소스 파일</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Buffer.cpp">
@@ -40,6 +48,12 @@
       <Filter>소스 파일\src</Filter>
     </ClCompile>
     <ClCompile Include="src\VAO.cpp">
+      <Filter>소스 파일\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>소스 파일\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Image.cpp">
       <Filter>소스 파일\src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,18 +88,16 @@
     <ClInclude Include="src\VAO.h">
       <Filter>소스 파일\src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>소스 파일\src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Image.h">
+      <Filter>소스 파일\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\frequently_used_code.txt">
       <Filter>소스 파일\src</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="fragment.glsl">
-      <Filter>소스 파일</Filter>
-    </None>
-    <None Include="vertex.glsl">
-      <Filter>소스 파일</Filter>
-    </None>
   </ItemGroup>
 </Project>
