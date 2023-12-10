@@ -44,9 +44,9 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
         }
         m_meshes.clear();
         c_flag = false;
-        bool p_flag = false;
+        /*bool p_flag = false;
         bool x_flag = false;
-        bool y_flag = false;
+        bool y_flag = false;*/
         Init();
         break;
     case 'q':
