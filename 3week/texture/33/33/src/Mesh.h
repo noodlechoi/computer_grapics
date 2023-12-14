@@ -17,7 +17,7 @@ private:
 	CVAO* m_vao{};
 	CBuffer* m_vertexbuffer{};
 	CBuffer* m_indexbuffer{};
-	std::vector<CTexture>m_texs;
+	//std::vector<CTexture>m_texs;
 public:
 	CMesh();
 	CMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, unsigned int primitive_type);

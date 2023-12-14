@@ -50,7 +50,7 @@ void CMesh::Init(const std::vector<Vertex>& vertices, const std::vector<unsigned
 
 void CMesh::InitText(std::string_view name)
 {
-    for (int i = 0; i < 6; ++i) {
+    /*for (int i = 0; i < 6; ++i) {
         m_texs.push_back(CTexture());
         m_texs[i].CreateTexture();
     }
@@ -60,13 +60,13 @@ void CMesh::InitText(std::string_view name)
     m_texs[2].SetTextureImage("res/C.png");
     m_texs[3].SetTextureImage("res/D.png");
     m_texs[4].SetTextureImage("res/E.png");
-    m_texs[5].SetTextureImage("res/F.png");
+    m_texs[5].SetTextureImage("res/F.png");*/
 }
 
 void CMesh::Draw(const CShader* program) const
 {
     m_vao->Bind();
-    m_texs[0].Bind();
+    //m_texs[0].Bind();
     glDrawElements(m_primitive_type, m_indexbuffer->GetCount(), GL_UNSIGNED_INT, 0);
 }
 
