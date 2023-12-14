@@ -47,7 +47,7 @@ void CContext::Motion(const int& x, const int& y)
 
 void CContext::Render()
 {
-    glm::vec3 camera_pos(0.0f, 3.0f, 15.0f);
+    glm::vec3 camera_pos(0.0f, 7.0f, 20.0f);
     auto camera_trans = glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_y), glm::vec3(0.0f, 1.0f, 0.0f));
     camera_pos = camera_trans * glm::vec4(camera_pos, 1.0f);
 
@@ -55,7 +55,7 @@ void CContext::Render()
         glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_pitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
         glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
 
-    auto projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 40.0f);
+    auto projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 50.0f);
 
     auto view = glm::lookAt(
         camera_pos,
@@ -95,21 +95,24 @@ void CContext::Render()
     m_box->Draw(m_program);
 
     // 큐브
-    m_program->SetUniform("objectColor", m_object_color);
-    model = glm::translate(glm::mat4(1.0), glm::vec3(0.0f))
-        * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            m_program->SetUniform("objectColor", glm::vec3(cube_color[i][j]));
+            model = glm::translate(glm::mat4(1.0), glm::vec3(-1.2f + 1.2f * j, 1.0f + 1.2f * i, 10.0f))
+                * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
  
-    transform = projection * view * model;
-    // transform, model 변환 행렬 전달
-    m_program->SetUniform("transform", transform);
-    m_program->SetUniform("modelTransform", model);
-    m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+            transform = projection * view * model;
+            // transform, model 변환 행렬 전달
+            m_program->SetUniform("transform", transform);
+            m_program->SetUniform("modelTransform", model);
+            m_program->SetUniform("invModelTransform", transpose(inverse(model)));
     
-    m_box->Draw(m_program);
-      
+            m_box->Draw(m_program);
+        }
+    }
 }
 
 void CContext::Init()
@@ -120,6 +123,17 @@ void CContext::Init()
     m_box = new CMesh();
     m_box->CreateBox();
 
+    // 큐브 색깔 초기화
+    cube_color.resize(3);
+    for (int i = 0; i < 3; ++i) {
+        cube_color[i].resize(3);
+    }
+
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            cube_color[i][j] = 0.8f;
+        }
+    }
 }
 
 void CContext::Update()
