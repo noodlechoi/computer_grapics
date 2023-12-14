@@ -1,7 +1,6 @@
 #pragma once
 #include "header.h"
 #include "header_user.h"
-#include "Model.h"
 
 class CContext
 {
@@ -33,7 +32,7 @@ private:
 
 	//glm::vec3 m_light_pos{ glm::vec3(0.0f, 0.0f, 0.0f) };
 	glm::vec3 m_light_color{ glm::vec3(1.0f, 1.0f, 1.0f) };
-	glm::vec3 m_object_color{ glm::vec3(1.0f, 0.5f, 0.0f) };
+	glm::vec3 m_object_color{ glm::vec3(0.0f, 0.5f, 0.0f) };
 	float m_ambient_strength{ 0.1f };
 	float m_spec_strength{ 0.6f };
 	float m_spec_shininess{ 32.0f };

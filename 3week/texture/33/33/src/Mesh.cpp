@@ -16,8 +16,8 @@ CMesh::CMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int
     m_indexbuffer = new CBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices.data(), sizeof(unsigned int), indices.size());
 
     m_vao->SetAttrib(0, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, position));
-    m_vao->SetAttrib(1, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, normal));
-    m_vao->SetAttrib(2, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, texture));
+    m_vao->SetAttrib(1, 4, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, normal));
+    m_vao->SetAttrib(2, 2, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, texture));
 }
 
 CMesh::~CMesh()
@@ -44,48 +44,64 @@ void CMesh::Init(const std::vector<Vertex>& vertices, const std::vector<unsigned
     m_indexbuffer = new CBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, indices.data() , sizeof(unsigned int), indices.size());
     
     m_vao->SetAttrib(0, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, position));
-    m_vao->SetAttrib(1, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, normal));
-    m_vao->SetAttrib(2, 3, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, texture));
+    m_vao->SetAttrib(1, 4, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, normal));
+    m_vao->SetAttrib(2, 2, GL_FLOAT, false, sizeof(Vertex), offsetof(Vertex, texture));
+}
+
+void CMesh::InitText(std::string_view name)
+{
+    for (int i = 0; i < 6; ++i) {
+        m_texs.push_back(CTexture());
+        m_texs[i].CreateTexture();
+    }
+
+    m_texs[0].SetTextureImage("res/A.png");
+    m_texs[1].SetTextureImage("res/B.png");
+    m_texs[2].SetTextureImage("res/C.png");
+    m_texs[3].SetTextureImage("res/D.png");
+    m_texs[4].SetTextureImage("res/E.png");
+    m_texs[5].SetTextureImage("res/F.png");
 }
 
 void CMesh::Draw(const CShader* program) const
 {
     m_vao->Bind();
+    m_texs[0].Bind();
     glDrawElements(m_primitive_type, m_indexbuffer->GetCount(), GL_UNSIGNED_INT, 0);
 }
 
 void CMesh::CreateBox()
 {
     std::vector<Vertex> vertices = {
-        Vertex { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f),  glm::vec2(1.0f, 0.0f)  },
-        Vertex { glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f),  glm::vec2(1.0f, 1.0f)  },
-        Vertex { glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  0.0f, -1.0f),  glm::vec2(0.0f, 1.0f) },
+        Vertex { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f,  0.0f, -1.0f, 0.5f), glm::vec2(0.0f, 0.0f)},
+        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(0.0f,  0.0f, -1.0f, 0.5f),  glm::vec2(1.0f, 0.0f)  },
+        Vertex { glm::vec3(0.5f,  0.5f, -0.5f), glm::vec4(0.0f,  0.0f, -1.0f, 0.5f),  glm::vec2(1.0f, 1.0f)  },
+        Vertex { glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec4(0.0f,  0.0f, -1.0f, 0.5f),  glm::vec2(0.0f, 1.0f) },
                                                                                    
-        Vertex { glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec2(0.0f, 0.0f)  },
-        Vertex { glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f),   glm::vec2(1.0f, 0.0f) },
-        Vertex { glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f),  glm::vec2(1.0f, 1.0f)  },
-        Vertex { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec2(0.0f, 1.0f)  },
+        Vertex { glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec4(0.0f,  0.0f,  1.0f, 0.5f), glm::vec2(0.0f, 0.0f)  },
+        Vertex { glm::vec3(0.5f, -0.5f,  0.5f), glm::vec4(0.0f,  0.0f,  1.0f, 0.5f),   glm::vec2(1.0f, 0.0f) },
+        Vertex { glm::vec3(0.5f,  0.5f,  0.5f), glm::vec4(0.0f,  0.0f,  1.0f, 0.5f),  glm::vec2(1.0f, 1.0f)  },
+        Vertex { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(0.0f,  0.0f,  1.0f, 0.5f), glm::vec2(0.0f, 1.0f)  },
                                                                                   
-        Vertex { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 0.0f) },
-        Vertex { glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 1.0f) },
-        Vertex { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(0.0f, 1.0f) },
-        Vertex { glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec2(0.0f, 0.0f) },
+        Vertex { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(-1.0f,  0.0f,  0.0f, 0.5f), glm::vec2(1.0f, 0.0f) },
+        Vertex { glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec4(-1.0f,  0.0f,  0.0f, 0.5f), glm::vec2(1.0f, 1.0f) },
+        Vertex { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(-1.0f,  0.0f,  0.0f, 0.5f), glm::vec2(0.0f, 1.0f) },
+        Vertex { glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec4(-1.0f,  0.0f,  0.0f, 0.5f), glm::vec2(0.0f, 0.0f) },
                                                                                   
-        Vertex { glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec2(1.0f, 0.0f)   },
-        Vertex { glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(1.0f, 1.0f)  },
-        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(0.0f, 1.0f)  },
-        Vertex { glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(1.0f,  0.0f,  0.0f),  glm::vec2(0.0f, 0.0f)  },
+        Vertex { glm::vec3(0.5f,  0.5f,  0.5f), glm::vec4(1.0f,  0.0f,  0.0f, 0.5f), glm::vec2(1.0f, 0.0f)   },
+        Vertex { glm::vec3(0.5f,  0.5f, -0.5f), glm::vec4(1.0f,  0.0f,  0.0f, 0.5f),  glm::vec2(1.0f, 1.0f)  },
+        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(1.0f,  0.0f,  0.0f, 0.5f),  glm::vec2(0.0f, 1.0f)  },
+        Vertex { glm::vec3(0.5f, -0.5f,  0.5f), glm::vec4(1.0f,  0.0f,  0.0f, 0.5f),  glm::vec2(0.0f, 0.0f)  },
                                                                                   
-        Vertex { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f,  0.0f),   glm::vec2(1.0f, 1.0f) },
-        Vertex { glm::vec3(0.5f, -0.5f,  0.5f), glm::vec3(0.0f, -1.0f,  0.0f),   glm::vec2(1.0f, 0.0f) },
-        Vertex { glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(0.0f, -1.0f,  0.0f),  glm::vec2(0.0f, 0.0f) },
+        Vertex { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f, -1.0f,  0.0f, 0.5f),  glm::vec2(0.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(0.0f, -1.0f,  0.0f, 0.5f),   glm::vec2(1.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f, -0.5f,  0.5f), glm::vec4(0.0f, -1.0f,  0.0f, 0.5f),   glm::vec2(1.0f, 0.0f) },
+        Vertex { glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec4(0.0f, -1.0f,  0.0f, 0.5f),  glm::vec2(0.0f, 0.0f) },
                                                                                   
-        Vertex { glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(0.0f, 1.0f) },
-        Vertex { glm::vec3(0.5f,  0.5f, -0.5f), glm::vec3(0.0f,  1.0f,  0.0f),   glm::vec2(1.0f, 1.0f)  },
-        Vertex { glm::vec3(0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(1.0f, 0.0f)  },
-        Vertex { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec3(0.0f,  1.0f,  0.0f),  glm::vec2(0.0f, 0.0f) },
+        Vertex { glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec4(0.0f,  1.0f,  0.0f, 0.5f),  glm::vec2(0.0f, 1.0f) },
+        Vertex { glm::vec3(0.5f,  0.5f, -0.5f), glm::vec4(0.0f,  1.0f,  0.0f, 0.5f),   glm::vec2(1.0f, 1.0f)  },
+        Vertex { glm::vec3(0.5f,  0.5f,  0.5f), glm::vec4(0.0f,  1.0f,  0.0f, 0.5f),  glm::vec2(1.0f, 0.0f)  },
+        Vertex { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec4(0.0f,  1.0f,  0.0f, 0.5f),  glm::vec2(0.0f, 0.0f) },
     };
 
     std::vector<uint32_t> indices = {
@@ -103,26 +119,26 @@ void CMesh::CreateBox()
 void CMesh::CreateSquarePy()
 {
     std::vector<Vertex> vertices = {
-        Vertex{glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.5f, 1.0f)},
-        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
+        Vertex{glm::vec3(0.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), glm::vec2(0.5f, 1.0f)},
+        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
 
-        Vertex{glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.5f, 1.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+        Vertex{glm::vec3(0.0f, 0.5f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), glm::vec2(0.5f, 1.0f)},
+        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
 
-        Vertex{glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.5f, 1.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f)},
+        Vertex{glm::vec3(0.0f, 0.5f, 0.0f), glm::vec4(0.0f, 0.0f, -1.0f, 1.0f), glm::vec2(0.5f, 1.0f)},
+        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 0.0f, -1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f, 0.0f, -1.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
 
-        Vertex{glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.5f, 1.0f)},
-        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+        Vertex{glm::vec3(0.0f, 0.5f, 0.0f), glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f), glm::vec2(0.5f, 1.0f)},
+        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
 
-        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
-        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(0.0f, 0.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
-        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(1.0f, 0.0f)},
+        Vertex{glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec4(0.0f, -1.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+        Vertex{glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec4(0.0f, -1.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+        Vertex{glm::vec3(0.5f, -0.5f, 0.5f), glm::vec4(0.0f, -1.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+        Vertex{glm::vec3(0.5f, -0.5f, -0.5f), glm::vec4(0.0f, -1.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
     };
 
     std::vector<uint32_t> indices = {

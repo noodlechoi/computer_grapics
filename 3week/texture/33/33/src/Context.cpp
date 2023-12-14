@@ -113,14 +113,17 @@ void CContext::Render()
     m_program->SetUniform("transform", transform);
     m_program->SetUniform("modelTransform", model);
     m_program->SetUniform("invModelTransform", transpose(inverse(model)));
-    
-    if (c_flag) {
-        m_meshes[0]->Draw(m_program);
-    }
-    else if (p_flag) {
-        m_meshes[1]->Draw(m_program);
-    }
 
+    m_meshes[0]->Draw(m_program);
+
+
+    ////--- 투명 객체 그리기
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //m_meshes[0]->Draw(m_program);
+    ////--- 블렌딩 해제
+    //glDisable(GL_BLEND);
+    
     //for (auto mesh : m_meshes) {
     //    mesh->Draw(m_program);
     //}
@@ -130,7 +133,6 @@ void CContext::Init()
 {
 	m_program = new CShader("vertex.glsl", "fragment.glsl");
 	m_program->MakeShaderProgram();
-
 
     m_meshes.push_back(new CMesh);
     m_meshes[0]->CreateBox();

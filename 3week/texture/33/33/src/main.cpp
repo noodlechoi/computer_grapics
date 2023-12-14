@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 	context.Init();
 	// ±Ì¿Ã ∞ÀªÁ º≥¡§
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 
 	PrintKey();
 
@@ -61,6 +61,6 @@ int main(int argc, char** argv)
 
 	// ±Ì¿Ã 
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
 }
 

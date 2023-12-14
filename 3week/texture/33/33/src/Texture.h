@@ -1,6 +1,5 @@
 #pragma once
 #include "header.h"
-#include "header_user.h"
 
 class CTexture
 {
@@ -13,9 +12,9 @@ public:
 	const unsigned int Get() const { return m_texture; }
 	void Gen();
 	void Bind() const;
-	void SetFilter(unsigned int min_filter, unsigned int mag_filter) const;
-	void SetWrap(unsigned int swrap, unsigned int twrap) const;
+	void SetFilter() const;
+	void SetWrap() const;
 	void CreateTexture();
-	void SetTextureImage(CImage* image);
+	void SetTextureImage(std::string_view name);
 };
 
