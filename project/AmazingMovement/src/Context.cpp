@@ -47,7 +47,7 @@ void CContext::Motion(const int& x, const int& y)
 
 void CContext::Render()
 {
-    glm::vec3 camera_pos(0.0f, 5.0f, 3.0f);
+    glm::vec3 camera_pos(0.0f, 3.0f, 15.0f);
     auto camera_trans = glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_y), glm::vec3(0.0f, 1.0f, 0.0f));
     camera_pos = camera_trans * glm::vec4(camera_pos, 1.0f);
 
@@ -80,8 +80,9 @@ void CContext::Render()
     m_program->SetUniform("lightColor", m_light_color);
    
     // 바닥
+    m_program->SetUniform("objectColor", glm::vec3(0.8f, 0.1f, 0.1f));
     auto model = glm::translate(glm::mat4(1.0), glm::vec3(0.0f))
-        * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
+        * glm::scale(glm::mat4(1.0f), glm::vec3(5.0f, 0.3f, 50.0f))
         * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
         * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
         * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -93,6 +94,8 @@ void CContext::Render()
 
     m_box->Draw(m_program);
 
+    // 큐브
+    m_program->SetUniform("objectColor", m_object_color);
     model = glm::translate(glm::mat4(1.0), glm::vec3(0.0f))
         * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
         * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))

@@ -22,7 +22,7 @@ private:
 
 
 	// camera front 방향 결정 각도
-	float m_camera_pitch{ -50.0f }; // x축
+	float m_camera_pitch{ 0.0f }; // x축
 	float m_camera_yaw{ 0.0f }; // y축
 	// roll 대신 up vector로 컨트롤
 
