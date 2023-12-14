@@ -145,6 +145,8 @@ void CContext::Render()
 
     m_box->Draw(m_program);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // 큐브 ( 오는 박스 )
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
@@ -184,6 +186,8 @@ void CContext::Render()
             m_box->Draw(m_program);
         }
     }
+
+    glDisable(GL_BLEND);
 }
 
 void CContext::Init()
@@ -193,6 +197,9 @@ void CContext::Init()
 
     m_box = new CMesh();
     m_box->CreateBox();
+    
+    m_leaf = new CMesh();
+    m_leaf->CreateSquarePy();
 
     // 플레이어 큐브 색깔 초기화
     player_color.resize(3);

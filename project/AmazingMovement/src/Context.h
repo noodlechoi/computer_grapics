@@ -53,6 +53,14 @@ private:
 	// 오는 큐브
 	std::vector<std::vector<glm::vec3>> cube_color; // 맞춰야하는 큐브
 	float cube_z{-20.0f};
+
+	// 트리
+	GLfloat tree_z = -30.0f;
+	int tree_loc = 1;
+	bool tx_init = false;
+	CMesh* m_leaf;
+	int tree_count = 20;
+	float m_tree_ry{ 45.0f };
 public:
 	CContext();
 	~CContext();
