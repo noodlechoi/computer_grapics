@@ -26,13 +26,57 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
     auto camera_right = glm::normalize(glm::cross(m_camera_up, -m_camera_front));
     auto camera_up = glm::normalize(glm::cross(-m_camera_front, camera_right));
     switch (key) {
-    case 'r':
+    case 'z':
+        color_cnt[0][0] = (color_cnt[0][0] + 1) % 4;
+        break;
+    case 'x':
+        color_cnt[0][1] = (color_cnt[0][1] + 1) % 4;
+        break;
+    case 'c':
+        color_cnt[0][2] = (color_cnt[0][2] + 1) % 4;
+        break;
+    case 'a':
+        color_cnt[1][0] = (color_cnt[1][0] + 1) % 4;
+        break;
+    case 's':
+        color_cnt[1][1] = (color_cnt[1][1] + 1) % 4;
+        break;
+    case 'd':
+        color_cnt[1][2] = (color_cnt[1][2] + 1) % 4;
         break;
     case 'q':
+        color_cnt[2][0] = (color_cnt[2][0] + 1) % 4;
+        break;
+    case 'w':
+        color_cnt[2][1] = (color_cnt[2][1] + 1) % 4;
+        break;
+    case 'e':
+        color_cnt[2][2] = (color_cnt[2][2] + 1) % 4;
+        break;
+    case 'p':
         exit(0);
     default:
         break;
     }
+
+    // cnt에 따라 색깔 지정
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (color_cnt[i][j] == 0) {
+                cube_color[i][j] = glm::vec3(0.8f);
+            }
+            else if (color_cnt[i][j] == 1) {
+                cube_color[i][j] = glm::vec3(0.8f, 0.8f, 0.0f);
+            }
+            else if (color_cnt[i][j] == 2) {
+                cube_color[i][j] = glm::vec3(0.0f, 0.8f, 0.0f);
+            }
+            else if (color_cnt[i][j] == 3) {
+                cube_color[i][j] = glm::vec3(0.8f, 0.0f, 0.8f);
+            }
+        }
+    }
+    
 
     glutPostRedisplay();
 }
@@ -97,8 +141,8 @@ void CContext::Render()
     // 큐브
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            m_program->SetUniform("objectColor", glm::vec3(cube_color[i][j]));
-            model = glm::translate(glm::mat4(1.0), glm::vec3(-1.2f + 1.2f * j, 1.0f + 1.2f * i, 10.0f))
+            m_program->SetUniform("objectColor", cube_color[i][j]);
+            model = glm::translate(glm::mat4(1.0), glm::vec3(-1.2f + 1.2f * j, 1.0f + 1.2f * i, 11.0f))
                 * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
@@ -131,9 +175,17 @@ void CContext::Init()
 
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            cube_color[i][j] = 0.8f;
+            cube_color[i][j] = glm::vec3(0.8f);
         }
     }
+
+    // 큐브 색깔 카운츠
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            color_cnt[i][j] = 0;
+        }
+    }
+
 }
 
 void CContext::Update()

@@ -22,7 +22,7 @@ private:
 
 
 	// camera front 방향 결정 각도
-	float m_camera_pitch{ -10.0f }; // x축
+	float m_camera_pitch{ -15.0f }; // x축
 	float m_camera_yaw{ 0.0f }; // y축
 	// roll 대신 up vector로 컨트롤
 
@@ -43,7 +43,8 @@ private:
 
 	// 객체 변환 변수
 	float m_light_obj_y{ 0.0f };
-	std::vector<std::vector<float>> cube_color;
+	std::vector<std::vector<glm::vec3>> cube_color;
+	int color_cnt[3][3];
 public:
 	CContext();
 	~CContext();
