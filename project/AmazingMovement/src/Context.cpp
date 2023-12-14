@@ -53,6 +53,13 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
     case 'e':
         color_cnt[2][2] = (color_cnt[2][2] + 1) % 4;
         break;
+    case 'o':
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                color_cnt[i][j] = 0;
+            }
+        }
+        break;
     case 'p':
         exit(0);
     default:
@@ -63,16 +70,16 @@ void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             if (color_cnt[i][j] == 0) {
-                cube_color[i][j] = glm::vec3(0.8f);
+                player_color[i][j] = glm::vec3(0.8f);
             }
             else if (color_cnt[i][j] == 1) {
-                cube_color[i][j] = glm::vec3(0.8f, 0.8f, 0.0f);
+                player_color[i][j] = glm::vec3(0.8f, 0.8f, 0.0f);
             }
             else if (color_cnt[i][j] == 2) {
-                cube_color[i][j] = glm::vec3(0.0f, 0.8f, 0.0f);
+                player_color[i][j] = glm::vec3(0.0f, 0.8f, 0.0f);
             }
             else if (color_cnt[i][j] == 3) {
-                cube_color[i][j] = glm::vec3(0.8f, 0.0f, 0.8f);
+                player_color[i][j] = glm::vec3(0.8f, 0.0f, 0.8f);
             }
         }
     }
@@ -138,11 +145,31 @@ void CContext::Render()
 
     m_box->Draw(m_program);
 
-    // 큐브
+    // 큐브 ( 오는 박스 )
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             m_program->SetUniform("objectColor", cube_color[i][j]);
-            model = glm::translate(glm::mat4(1.0), glm::vec3(-1.2f + 1.2f * j, 1.0f + 1.2f * i, 11.0f))
+            model = glm::translate(glm::mat4(1.0), glm::vec3(-1.2f + 1.2f * j, 1.0f + 1.2f * i, cube_z))
+                * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+                * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+            transform = projection * view * model;
+            // transform, model 변환 행렬 전달
+            m_program->SetUniform("transform", transform);
+            m_program->SetUniform("modelTransform", model);
+            m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+
+            m_box->Draw(m_program);
+        }
+    }
+
+    // 큐브 ( 플레이어 박스 )
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            m_program->SetUniform("objectColor", player_color[i][j]);
+            model = glm::translate(glm::mat4(1.0), glm::vec3(-1.2f + 1.2f * j, 1.0f + 1.2f * i, player_z))
                 * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
                 * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
@@ -167,24 +194,27 @@ void CContext::Init()
     m_box = new CMesh();
     m_box->CreateBox();
 
-    // 큐브 색깔 초기화
-    cube_color.resize(3);
+    // 플레이어 큐브 색깔 초기화
+    player_color.resize(3);
     for (int i = 0; i < 3; ++i) {
-        cube_color[i].resize(3);
+        player_color[i].resize(3);
     }
 
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            cube_color[i][j] = glm::vec3(0.8f);
+            player_color[i][j] = glm::vec3(0.8f);
         }
     }
 
-    // 큐브 색깔 카운츠
+    // 큐브 색깔 카운트
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             color_cnt[i][j] = 0;
         }
     }
+
+    GenCube();
+    
 
 }
 
@@ -192,10 +222,70 @@ void CContext::Update()
 {
 }
 
+void CContext::GenCube()
+{
+    // 오는 큐브 색깔 초기화
+    cube_color.resize(3);
+    for (int i = 0; i < 3; ++i) {
+        cube_color[i].resize(3);
+    }
+
+    CRandom rand_machine;
+    int rand_num = 0;
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            rand_num = rand_machine.get(0, 3);
+            if (rand_num == 0) {
+                cube_color[i][j] = glm::vec3(0.8f);
+            }
+            else if (rand_num == 1) {
+                cube_color[i][j] = glm::vec3(0.8f, 0.8f, 0.0f);
+            }
+            else if (rand_num == 2) {
+                cube_color[i][j] = glm::vec3(0.0f, 0.8f, 0.0f);
+            }
+            else if (rand_num == 3) {
+                cube_color[i][j] = glm::vec3(0.8f, 0.0f, 0.8f);
+            }
+        }
+    }
+
+}
+
+bool CContext::CheckColor()
+{
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (cube_color[i][j] != player_color[i][j])
+                return false;
+        }
+    }
+    return true;
+}
+
 void CContext::Time(int value)
 {
     if (value == 1) {
-        
+        cube_z += 0.5f;
+
+        if (cube_z >= player_z) {
+            if (!CheckColor()) {// 틀렸으면 속도 감소
+                if (cube_speed <= 1000) {
+                    cube_speed += 10;
+                }
+            }
+            else {
+                if (cube_speed >= 10) {
+                    cube_speed -= 10;
+                }
+            }
+
+            // 큐브 재생성
+            cube_z =  -20.0f;
+            cube_color.clear();
+            GenCube();
+        }
+
         glutPostRedisplay();
     }
 }

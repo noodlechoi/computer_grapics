@@ -6,7 +6,8 @@ using std::cout;
 using std::endl;
 void PrintKey()
 {
-	cout << "q : 프로그램 종료" << endl;
+	cout << "o : 색깔 초기화" << endl;
+	cout << "p : 프로그램 종료" << endl;
 }
 
 void DrawScene()
@@ -36,7 +37,7 @@ void Motion(int x, int y)
 void Time(int value)
 {
 	context.Time(value);
-	glutTimerFunc(1000, Time, 1);
+	glutTimerFunc(context.GetSpeed(), Time, 1);
 }
 
 int main(int argc, char** argv)
