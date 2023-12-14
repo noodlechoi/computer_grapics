@@ -16,6 +16,9 @@ CContext::~CContext()
     if (m_box) {
         delete m_box;
     }
+    if (m_tetra) {
+        delete m_tetra;
+    }
 }
 
 void CContext::KeyBoard(const unsigned char& key, const int& x, const int& y)
@@ -146,6 +149,20 @@ void CContext::Render()
 
     m_box->Draw(m_program);
 
+    m_program->SetUniform("objectColor", glm::vec3(0.5f, 0.1f, 0.1f));
+    model = glm::translate(glm::mat4(1.0), glm::vec3(0.0f))
+        * glm::scale(glm::mat4(1.0f), glm::vec3(10.0f, 0.3f, 50.0f))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    transform = projection * view * model;
+    // transform, model 변환 행렬 전달
+    m_program->SetUniform("transform", transform);
+    m_program->SetUniform("modelTransform", model);
+    m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+
+    m_box->Draw(m_program);
+
     // 나무
     GLfloat tree_z = -30.0f;
     for (int i = 0; i < tree_count; ++i) {
@@ -240,6 +257,94 @@ void CContext::Render()
         m_program->SetUniform("modelTransform", model);
         m_program->SetUniform("invModelTransform", transpose(inverse(model)));
         m_box->Draw(m_program);
+
+
+        // 산
+        m_program->SetUniform("objectColor", glm::vec3(0.2f, 0.3f, 0.2f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(4.f, 7.0f, -25.f))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(40.f, 15.f, 1.f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(30.f), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_tetra->Draw(m_program);
+
+        m_program->SetUniform("objectColor", glm::vec3(0.2f, 0.4f, 0.2f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(-5.f, 5.0f, -20.f))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(40.f, 10.f, 1.f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(-20.f), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_tetra->Draw(m_program);
+
+
+        // 집
+        m_program->SetUniform("objectColor", glm::vec3(0.6f, 0.2f, 0.6f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(-10.0f, 3.0f, -18.0f))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(8.f, 4.0f, 4.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_tetra->Draw(m_program);
+
+        m_program->SetUniform("objectColor", glm::vec3(0.9f, 0.9f, 0.9f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(-10.0f, 0.0f, -18.0f))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(7.f, 3.0f, 3.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_box->Draw(m_program);
+
+        m_program->SetUniform("objectColor", glm::vec3(0.6f, 0.2f, 0.2f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(13.0f, 3.0f, -18.0f))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(8.f, 4.0f, 4.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_tetra->Draw(m_program);
+
+        m_program->SetUniform("objectColor", glm::vec3(0.4f, 0.9f, 0.9f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(13.0f, 0.0f, -18.0f))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(7.f, 3.0f, 3.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_box->Draw(m_program);
     }
 
 
@@ -287,7 +392,6 @@ void CContext::Render()
             m_box->Draw(m_program);
         }
     }
-
     RenderFireWork(view, projection);
 
     glDisable(GL_BLEND);
@@ -344,14 +448,12 @@ void CContext::Init()
     }
 
     GenCube();
+    
 
-    // 불꽃놀이 큐브 생성
-    //fire_pos.push_back(glm::vec3(-3.0f, 1.0f, 11.0f));
 }
 
 void CContext::Update()
 {
-
 }
 
 void CContext::GenCube()
@@ -395,21 +497,23 @@ bool CContext::CheckColor()
     return true;
 }
 
-
 void CContext::Time(int value)
 {
     if (value == 1) {
         cube_z += 0.5f;
+        m_tree_ry += 1.f;
 
         // 큐브끼리 닿으면
         if (cube_z >= player_z) {
             if (!CheckColor()) {// 틀렸으면 속도 감소
+                PlaySound(TEXT(SOUND_FILE_FAILED), NULL, SND_ASYNC | SND_ALIAS);
                 if (cube_speed <= 1000) {
                     cube_speed += 10;
                 }
             }
-            else {
+            else {  // 맞으면
                 is_success = true;
+                PlaySound(TEXT(SOUND_FILE_SUCCESS), NULL, SND_ASYNC | SND_ALIAS);
                 if (cube_speed >= 10) {
                     cube_speed -= 10;
                 }
@@ -439,9 +543,9 @@ void CContext::Time(int value)
 
         int i = 0;
         for (auto f : firework) {
-            firework[i].now_pos += glm::vec3(f.velocity.x /2, f.velocity.y, 0.0f);
+            firework[i].now_pos += glm::vec3(f.velocity.x / 2, f.velocity.y, 0.0f);
             i++;
-            
+
             // 20개 이상이면 불꽃 생성 정지
             if (i >= 20) {
                 is_success = false;

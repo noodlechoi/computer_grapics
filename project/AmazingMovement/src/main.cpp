@@ -42,6 +42,9 @@ void Time(int value)
 
 int main(int argc, char** argv)
 {
+
+	PlaySound(TEXT(SOUND_FILE_BGM), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
+
 	CGL::GetInstance()->InitWindow(argc, argv, WIDTH, HEIGHT, "Amazing Movement");
 	CGL::GetInstance()->Render(DrawScene);
 
