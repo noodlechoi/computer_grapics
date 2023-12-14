@@ -119,7 +119,8 @@ void CContext::Render()
     light_pos = light_trans * glm::vec4(light_pos, 1.0f);
 
     m_program->UseShader();
-    
+    glEnable(GL_CULL_FACE);
+
     // 모델 조명
     m_program->SetUniform("viewPos", camera_pos);
     m_program->SetUniform("lightPos", light_pos);
@@ -144,6 +145,106 @@ void CContext::Render()
     m_program->SetUniform("invModelTransform", transpose(inverse(model)));
 
     m_box->Draw(m_program);
+
+    // 나무
+    GLfloat tree_z = -30.0f;
+    for (int i = 0; i < tree_count; ++i) {
+
+        tree_z += 6.0f;
+
+        m_program->SetUniform("objectColor", glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(3.8f, 3.0f, tree_z))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(2.5f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_tree_ry), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_tetra->Draw(m_program);
+
+        m_program->SetUniform("objectColor", glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(3.8f, 2.4f, tree_z))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(2.5f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_tree_ry), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_tetra->Draw(m_program);
+
+        m_program->SetUniform("objectColor", glm::vec3(0.5f, 0.3f, 0.0f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(3.8f, 0.3f, tree_z))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(0.8f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_tree_ry), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_box->Draw(m_program);
+    }
+
+    GLfloat tree_z2 = -30.0f;
+    for (int i = 0; i < tree_count; ++i) {
+        tree_z2 += 6.0f;
+
+        m_program->SetUniform("objectColor", glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(-3.8f, 3.0f, tree_z2))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(2.5f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_tree_ry), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_tetra->Draw(m_program);
+
+        m_program->SetUniform("objectColor", glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(-3.8f, 2.4f, tree_z2))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(2.5f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_tree_ry), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_tetra->Draw(m_program);
+
+        m_program->SetUniform("objectColor", glm::vec3(0.5f, 0.3f, 0.0f));
+        model = glm::translate(glm::mat4(1.0), glm::vec3(-3.8f, 0.3f, tree_z2))
+            * glm::scale(glm::mat4(1.0f), glm::vec3(0.8f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_tree_ry), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        transform = projection * view * model;
+
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+        m_box->Draw(m_program);
+    }
+
+
+
+    glDisable(GL_CULL_FACE);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -198,8 +299,8 @@ void CContext::Init()
     m_box = new CMesh();
     m_box->CreateBox();
     
-    m_leaf = new CMesh();
-    m_leaf->CreateSquarePy();
+    m_tetra = new CMesh();
+    m_tetra->CreateSquarePy();
 
     // 플레이어 큐브 색깔 초기화
     player_color.resize(3);
