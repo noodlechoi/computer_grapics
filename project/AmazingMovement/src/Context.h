@@ -41,29 +41,9 @@ private:
 	float m_spec_strength{ 0.6f };
 	float m_spec_shininess{ 32.0f };
 
-	// 실습 키 입력 flag
-	bool t_flag = false;
-	bool y_flag = false;
-	bool Y_flag = false;
-	bool one_flag = false;
-	bool two_flag = false;
-	bool three_flag = false;
-	bool is_start = false;
-	int color_cnt{};
-
 	// 객체 변환 변수
 	float m_light_obj_y{ 0.0f };
-	int div_width{};
-	int div_height{};
-	glm::vec3 first_box_pos{ glm::vec3(0.0f) };
-	float size_width{};
-	float size_height{};
-
-	std::vector<std::vector<float>> rand_size;
-	std::vector<float> time_size;
-	std::vector<std::vector<bool>> size_turn;
-	std::vector<std::vector<float>> pyramid_size;
-	int ani_speed{ 100 };
+	
 public:
 	CContext();
 	~CContext();
@@ -75,6 +55,5 @@ public:
 	void Time(int value);
 	void Render();
 	void Update();
-	int GetSpeed() { return ani_speed; };
 };
 
