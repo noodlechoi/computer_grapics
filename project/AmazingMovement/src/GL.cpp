@@ -17,7 +17,7 @@ CGL::~CGL()
 
 }
 
-void CGL::InitWindow(int argc, char** argv, const int& x, const int& y, std::string_view name)
+void CGL::InitWindow(int argc, char** argv, const int& x, const int& y, std::string name)
 {
 	//--- 윈도우 생성하기
 	glutInit(&argc, argv);

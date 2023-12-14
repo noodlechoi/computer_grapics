@@ -22,47 +22,47 @@ GLuint CShader::GetID() const
 	return m_program;
 }
 
-void CShader::EnableLocation(const std::string_view name) const
+void CShader::EnableLocation(const std::string name) const
 {
 	glEnableVertexAttribArray(glGetAttribLocation(m_program, name.data()));
 }
 
-void CShader::DisableLocation(const std::string_view name) const
+void CShader::DisableLocation(const std::string name) const
 {
 	glDisableVertexAttribArray(glGetAttribLocation(m_program, name.data())); // Disable ÇÊ¼ö!
 }
 
-void CShader::SetUniform(const std::string_view name, int value) const
+void CShader::SetUniform(const std::string name, int value) const
 {
 	auto loc = glGetUniformLocation(m_program, name.data());
 	glUniform1i(loc, value);
 }
 
-void CShader::SetUniform(const std::string_view name, float value) const
+void CShader::SetUniform(const std::string name, float value) const
 {
 	auto loc = glGetUniformLocation(m_program, name.data());
 	glUniform1f(loc, value);
 }
 
-void CShader::SetUniform(const std::string_view name, const glm::vec2& value) const
+void CShader::SetUniform(const std::string name, const glm::vec2& value) const
 {
 	auto loc = glGetUniformLocation(m_program, name.data());
 	glUniform2fv(loc, 1, glm::value_ptr(value));
 }
 
-void CShader::SetUniform(const std::string_view name, const glm::vec3& value) const
+void CShader::SetUniform(const std::string name, const glm::vec3& value) const
 {
 	auto loc = glGetUniformLocation(m_program, name.data());
 	glUniform3fv(loc, 1, glm::value_ptr(value));
 }
 
-void CShader::SetUniform(const std::string_view name, const glm::vec4& value) const
+void CShader::SetUniform(const std::string name, const glm::vec4& value) const
 {
 	auto loc = glGetUniformLocation(m_program, name.data());
 	glUniform4fv(loc, 1, glm::value_ptr(value));
 }
 
-void CShader::SetUniform(const std::string_view name, const glm::mat4& value) const
+void CShader::SetUniform(const std::string name, const glm::mat4& value) const
 {
 	auto loc = glGetUniformLocation(m_program, name.data());
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));

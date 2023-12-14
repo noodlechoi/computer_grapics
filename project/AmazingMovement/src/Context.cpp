@@ -392,13 +392,28 @@ void CContext::Render()
             m_box->Draw(m_program);
         }
     }
-    RenderFireWork(view, projection);
+    RenderFireWork();
 
     glDisable(GL_BLEND);
 }
 
-void CContext::RenderFireWork(const auto view, const auto projection)
+void CContext::RenderFireWork()
 {
+    glm::vec3 camera_pos(0.0f, 7.0f, 20.0f);
+    auto camera_trans = glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_y), glm::vec3(0.0f, 1.0f, 0.0f));
+    camera_pos = camera_trans * glm::vec4(camera_pos, 1.0f);
+
+    m_camera_front = glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_yaw), glm::vec3(0.0f, 1.0f, 0.0f)) *
+        glm::rotate(glm::mat4(1.0f), glm::radians(m_camera_pitch), glm::vec3(1.0f, 0.0f, 0.0f)) *
+        glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+
+    auto projection = glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.01f, 50.0f);
+
+    auto view = glm::lookAt(
+        camera_pos,
+        camera_pos + m_camera_front,
+        m_camera_up);
+
     for (auto f : firework) {
         m_program->SetUniform("objectColor", glm::vec3(1.0f, 0.0f, 1.0f));
         auto model = glm::translate(glm::mat4(1.0), f.now_pos)

@@ -12,7 +12,7 @@ CModel::~CModel()
     m_meshes.clear();
 }
 
-void CModel::Create(std::string_view name)
+void CModel::Create(std::string name)
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
@@ -26,7 +26,7 @@ void CModel::Create(std::string_view name)
     m_meshes.push_back(mesh);
 }
 
-bool CModel::Load(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::string_view name)
+bool CModel::Load(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices, std::string name)
 {
     std::ifstream file;
 	file.open(name.data());

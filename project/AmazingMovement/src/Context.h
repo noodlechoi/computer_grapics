@@ -85,6 +85,6 @@ public:
 	void GenCube();
 	bool CheckColor();
 	int GetSpeed() { return cube_speed; }
-	void RenderFireWork(const auto view, const auto projection);
+	void RenderFireWork();
 };
 
