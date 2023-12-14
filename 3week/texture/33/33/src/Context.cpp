@@ -87,10 +87,11 @@ void CContext::Render()
 
     // 조명 위치 계산
     glm::vec3 light_pos(0.0f, 0.0f, 0.0f);
-    auto light_trans = glm::rotate(glm::mat4(1.0f), glm::radians(m_light_obj_y), glm::vec3(0.0f, 1.0f,1.0f)) * glm::translate(glm::mat4(1.0), radius);
+    auto light_trans = glm::rotate(glm::mat4(1.0f), glm::radians(m_light_obj_y), glm::vec3(0.0f, 2.0f, 3.0f)) * glm::translate(glm::mat4(1.0), radius);
     light_pos = light_trans * glm::vec4(light_pos, 1.0f);
 
     m_program->UseShader();
+
     
     // 모델 조명
     m_program->SetUniform("viewPos", m_camera_pos);
@@ -102,6 +103,11 @@ void CContext::Render()
 
     m_program->SetUniform("objectColor", m_object_color);
 
+
+    // 바닥
+
+
+    // 큐브
     auto model = glm::translate(glm::mat4(1.0), glm::vec3(0.0f))
         * glm::scale(glm::mat4(1.0f), glm::vec3(1.0f))
         * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
@@ -115,7 +121,6 @@ void CContext::Render()
     m_program->SetUniform("invModelTransform", transpose(inverse(model)));
 
     m_meshes[0]->Draw(m_program);
-
 
     ////--- 투명 객체 그리기
     //glEnable(GL_BLEND);
@@ -148,12 +153,7 @@ void CContext::Update()
 void CContext::Time(int value)
 {
     if (value == 1) {
-        if (x_flag) {
-            m_obj_radian_x += 10;
-        }
-        if (y_flag) {
-            m_obj_radian_y += 10;
-        }
+        
         glutPostRedisplay();
     }
 }
