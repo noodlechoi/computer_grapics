@@ -3,6 +3,12 @@
 #include "header_user.h"
 #include "Model.h"
 
+typedef struct FireWork
+{
+	glm::vec3 now_pos;
+	glm::vec3 velocity;
+}FireWork;
+
 class CContext
 {
 private:
@@ -59,6 +65,10 @@ private:
 	// 오는 큐브
 	std::vector<std::vector<glm::vec3>> cube_color; // 맞춰야하는 큐브
 	float cube_z{-20.0f};
+	
+	// 불꽃놀이 큐브
+	std::vector<FireWork> firework;
+	bool is_success{ false };
 public:
 	CContext();
 	~CContext();
@@ -75,5 +85,6 @@ public:
 	void GenCube();
 	bool CheckColor();
 	int GetSpeed() { return cube_speed; }
+	void RenderFireWork(const auto view, const auto projection);
 };
 

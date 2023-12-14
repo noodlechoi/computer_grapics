@@ -288,7 +288,29 @@ void CContext::Render()
         }
     }
 
+    RenderFireWork(view, projection);
+
     glDisable(GL_BLEND);
+}
+
+void CContext::RenderFireWork(const auto view, const auto projection)
+{
+    for (auto f : firework) {
+        m_program->SetUniform("objectColor", glm::vec3(1.0f, 0.0f, 1.0f));
+        auto model = glm::translate(glm::mat4(1.0), f.now_pos)
+            * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_y), glm::vec3(0.0f, 1.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(m_obj_radian_x), glm::vec3(1.0f, 0.0f, 0.0f))
+            * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        auto transform = projection * view * model;
+
+        // transform, model 변환 행렬 전달
+        m_program->SetUniform("transform", transform);
+        m_program->SetUniform("modelTransform", model);
+        m_program->SetUniform("invModelTransform", transpose(inverse(model)));
+
+        m_box->Draw(m_program);
+    }
 }
 
 void CContext::Init()
@@ -322,12 +344,14 @@ void CContext::Init()
     }
 
     GenCube();
-    
 
+    // 불꽃놀이 큐브 생성
+    //fire_pos.push_back(glm::vec3(-3.0f, 1.0f, 11.0f));
 }
 
 void CContext::Update()
 {
+
 }
 
 void CContext::GenCube()
@@ -371,6 +395,7 @@ bool CContext::CheckColor()
     return true;
 }
 
+
 void CContext::Time(int value)
 {
     if (value == 1) {
@@ -384,6 +409,7 @@ void CContext::Time(int value)
                 }
             }
             else {
+                is_success = true;
                 if (cube_speed >= 10) {
                     cube_speed -= 10;
                 }
@@ -393,6 +419,34 @@ void CContext::Time(int value)
             cube_z =  -20.0f;
             cube_color.clear();
             GenCube();
+        }
+
+        // 불꽃놀이 애니메이션
+        if (is_success) {
+            CRandom rand_machine;
+            FireWork f;
+            if (rand_machine.get(0, 2) == 0) {
+                f.now_pos = glm::vec3(-3.0f, 1.0f, 11.0f);
+                f.velocity = glm::vec3(rand_machine.get(0.0f, 1.0f), rand_machine.get(0.0f, 1.0f) + 1.0f, 0.0f);
+            }
+            else {
+                f.now_pos = glm::vec3(3.0f, 1.0f, 11.0f);
+                f.velocity = glm::vec3(rand_machine.get(0.0f, 1.0f), rand_machine.get(0.0f, 1.0f) + 1.0f, 0.0f);
+            }
+
+            firework.push_back(f);
+        }
+
+        int i = 0;
+        for (auto f : firework) {
+            firework[i].now_pos += glm::vec3(f.velocity.x /2, f.velocity.y, 0.0f);
+            i++;
+            
+            // 20개 이상이면 불꽃 생성 정지
+            if (i >= 20) {
+                is_success = false;
+                firework.clear();
+            }
         }
 
         glutPostRedisplay();
