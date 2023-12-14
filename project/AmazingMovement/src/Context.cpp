@@ -376,6 +376,7 @@ void CContext::Time(int value)
     if (value == 1) {
         cube_z += 0.5f;
 
+        // 큐브끼리 닿으면
         if (cube_z >= player_z) {
             if (!CheckColor()) {// 틀렸으면 속도 감소
                 if (cube_speed <= 1000) {
